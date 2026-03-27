@@ -53,13 +53,16 @@ export function CalendarView() {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Button onClick={() => { setSelectedSchedule(null); setDefaultDate(""); setFormOpen(true); }}>
+        <Button
+          className="rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-violet-700"
+          onClick={() => { setSelectedSchedule(null); setDefaultDate(""); setFormOpen(true); }}
+        >
           <Plus className="mr-2 h-4 w-4" />
           새 일정
         </Button>
       </div>
 
-      <div className="calendar-wrapper rounded-lg border bg-white p-4">
+      <div className="calendar-wrapper rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"

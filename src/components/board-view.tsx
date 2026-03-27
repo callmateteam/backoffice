@@ -11,19 +11,17 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { useSchedules, useUpdateSchedule } from "@/hooks/use-schedules";
-import { useTodos } from "@/hooks/use-todos";
 import { ScheduleForm } from "@/components/schedule-form";
 import { ScheduleDetail } from "@/components/schedule-detail";
 import { Schedule, ScheduleStatus } from "@/types";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Plus, GripVertical } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-const COLUMNS: { id: ScheduleStatus; label: string; color: string }[] = [
-  { id: "todo", label: "할 일", color: "bg-gray-100" },
-  { id: "in-progress", label: "진행 중", color: "bg-blue-50" },
-  { id: "done", label: "완료", color: "bg-green-50" },
+const COLUMNS: { id: ScheduleStatus; label: string; color: string; headerColor: string; count: string }[] = [
+  { id: "todo", label: "할 일", color: "bg-gray-50/80", headerColor: "bg-gray-200", count: "text-gray-600" },
+  { id: "in-progress", label: "진행 중", color: "bg-blue-50/50", headerColor: "bg-blue-500", count: "text-blue-600" },
+  { id: "done", label: "완료", color: "bg-emerald-50/50", headerColor: "bg-emerald-500", count: "text-emerald-600" },
 ];
 
 function ScheduleCard({
@@ -34,35 +32,38 @@ function ScheduleCard({
   onClick: () => void;
 }) {
   return (
-    <Card
-      className="cursor-pointer transition-shadow hover:shadow-md"
+    <div
+      className="group cursor-pointer rounded-xl border border-gray-100 bg-white p-3.5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
       onClick={onClick}
     >
-      <CardContent className="p-3">
-        <div className="flex items-start gap-2">
-          <GripVertical className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <div
-                className="h-2 w-2 shrink-0 rounded-full"
-                style={{ backgroundColor: schedule.color }}
-              />
-              <p className="truncate text-sm font-medium">{schedule.title}</p>
-            </div>
-            {schedule.description && (
-              <p className="mt-1 truncate text-xs text-muted-foreground">
-                {schedule.description}
-              </p>
-            )}
-            {schedule.assignee && (
-              <p className="mt-1 text-xs text-muted-foreground">
+      <div className="flex items-start gap-2.5">
+        <GripVertical className="mt-0.5 h-4 w-4 shrink-0 text-gray-300 transition-colors group-hover:text-gray-400" />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <div
+              className="h-2.5 w-2.5 shrink-0 rounded-full"
+              style={{ backgroundColor: schedule.color }}
+            />
+            <p className="truncate text-sm font-semibold text-gray-800">{schedule.title}</p>
+          </div>
+          {schedule.description && (
+            <p className="mt-1.5 truncate text-xs text-gray-400">
+              {schedule.description}
+            </p>
+          )}
+          {schedule.assignee && (
+            <div className="mt-2 flex items-center gap-1.5">
+              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-linear-to-br from-indigo-400 to-violet-400 text-[10px] font-medium text-white">
+                {schedule.assignee[0]?.toUpperCase()}
+              </div>
+              <p className="truncate text-xs text-gray-400">
                 {schedule.assignee}
               </p>
-            )}
-          </div>
+            </div>
+          )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -71,9 +72,7 @@ export function BoardView() {
   const updateSchedule = useUpdateSchedule();
   const [formOpen, setFormOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
-  const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(
-    null
-  );
+  const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const sensors = useSensors(
@@ -111,9 +110,10 @@ export function BoardView() {
     : null;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex justify-end">
         <Button
+          className="rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-violet-700"
           onClick={() => {
             setSelectedSchedule(null);
             setFormOpen(true);
@@ -129,20 +129,23 @@ export function BoardView() {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {COLUMNS.map((col) => {
             const items = schedules.filter((s) => s.status === col.id);
             return (
               <div
                 key={col.id}
                 id={col.id}
-                className={`min-h-[400px] rounded-lg ${col.color} p-3`}
+                className={cn("min-h-100 rounded-2xl p-4", col.color)}
               >
-                <div className="mb-3 flex items-center justify-between">
-                  <h3 className="text-sm font-semibold">{col.label}</h3>
-                  <Badge variant="secondary">{items.length}</Badge>
+                <div className="mb-4 flex items-center gap-2.5">
+                  <div className={cn("h-2.5 w-2.5 rounded-full", col.headerColor)} />
+                  <h3 className="text-sm font-bold text-gray-700">{col.label}</h3>
+                  <span className={cn("ml-auto rounded-full bg-white px-2.5 py-0.5 text-xs font-bold shadow-sm", col.count)}>
+                    {items.length}
+                  </span>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {items.map((schedule) => (
                     <div key={schedule.id} id={schedule.id}>
                       <ScheduleCard

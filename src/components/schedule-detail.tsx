@@ -20,9 +20,9 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  todo: { label: "할 일", className: "bg-gray-100 text-gray-700" },
-  "in-progress": { label: "진행 중", className: "bg-blue-100 text-blue-700" },
-  done: { label: "완료", className: "bg-green-100 text-green-700" },
+  todo: { label: "할 일", className: "bg-gray-100 text-gray-600" },
+  "in-progress": { label: "진행 중", className: "bg-blue-50 text-blue-600" },
+  done: { label: "완료", className: "bg-emerald-50 text-emerald-600" },
 };
 
 interface ScheduleDetailProps {
@@ -114,7 +114,7 @@ export function ScheduleDetail({
                 </p>
               )}
 
-              <div className="space-y-2 rounded-lg bg-gray-50 p-3">
+              <div className="space-y-2 rounded-xl bg-gray-50/80 p-4">
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
                   <div>

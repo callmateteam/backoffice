@@ -136,7 +136,7 @@ export function ScheduleForm({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>시작일 *</Label>
               <Input
@@ -188,10 +188,10 @@ export function ScheduleForm({
                   type="button"
                   onClick={() => setStatus(s.value)}
                   className={cn(
-                    "rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
+                    "rounded-full border px-4 py-1.5 text-sm font-medium transition-all",
                     status === s.value
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-white text-muted-foreground hover:bg-gray-50"
+                      ? "border-indigo-600 bg-indigo-600 text-white shadow-sm shadow-indigo-200"
+                      : "border-gray-200 bg-white text-gray-500 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
                   )}
                 >
                   {s.label}

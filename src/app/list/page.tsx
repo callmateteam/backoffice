@@ -13,8 +13,11 @@ export default function ListPage() {
   return (
     <>
       <Navbar />
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6">
-        <h1 className="mb-4 text-2xl font-bold">리스트</h1>
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">리스트</h1>
+          <p className="mt-1 text-sm text-gray-500">일정을 목록으로 관리하세요</p>
+        </div>
         <ListView />
       </main>
     </>
