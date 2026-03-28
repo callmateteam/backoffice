@@ -10,6 +10,7 @@ import { ScheduleForm } from "@/components/schedule-form";
 import { ScheduleDetail } from "@/components/schedule-detail";
 import { Schedule } from "@/types";
 import { Button } from "@/components/ui/button";
+import { AssigneeFilter } from "@/components/assignee-filter";
 import { Plus } from "lucide-react";
 
 export function CalendarView() {
@@ -18,8 +19,14 @@ export function CalendarView() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
   const [defaultDate, setDefaultDate] = useState<string>("");
+  const [assigneeFilter, setAssigneeFilter] = useState("all");
 
-  const events = schedules.map((s) => ({
+  const assignees = [...new Set(schedules.map((s) => s.assignee).filter(Boolean))];
+  const filteredSchedules = assigneeFilter === "all"
+    ? schedules
+    : schedules.filter((s) => s.assignee === assigneeFilter);
+
+  const events = filteredSchedules.map((s) => ({
     id: s.id,
     title: s.title,
     start: s.startDate.split("T")[0],
@@ -52,6 +59,10 @@ export function CalendarView() {
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <AssigneeFilter assignees={assignees} selected={assigneeFilter} onChange={setAssigneeFilter} />
+      </div>
+
       <div className="flex justify-end">
         <Button
           className="rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-violet-700"

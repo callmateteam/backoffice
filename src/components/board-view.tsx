@@ -15,6 +15,7 @@ import { ScheduleForm } from "@/components/schedule-form";
 import { ScheduleDetail } from "@/components/schedule-detail";
 import { Schedule, ScheduleStatus } from "@/types";
 import { Button } from "@/components/ui/button";
+import { AssigneeFilter } from "@/components/assignee-filter";
 import { Plus, GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -74,6 +75,12 @@ export function BoardView() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [assigneeFilter, setAssigneeFilter] = useState("all");
+
+  const assignees = [...new Set(schedules.map((s) => s.assignee).filter(Boolean))];
+  const filteredSchedules = assigneeFilter === "all"
+    ? schedules
+    : schedules.filter((s) => s.assignee === assigneeFilter);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -111,6 +118,10 @@ export function BoardView() {
 
   return (
     <div className="space-y-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <AssigneeFilter assignees={assignees} selected={assigneeFilter} onChange={setAssigneeFilter} />
+      </div>
+
       <div className="flex justify-end">
         <Button
           className="rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-violet-700"
@@ -131,7 +142,7 @@ export function BoardView() {
       >
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {COLUMNS.map((col) => {
-            const items = schedules.filter((s) => s.status === col.id);
+            const items = filteredSchedules.filter((s) => s.status === col.id);
             return (
               <div
                 key={col.id}

@@ -9,6 +9,7 @@ import { Schedule } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, ChevronDown, ChevronRight, Search } from "lucide-react";
+import { AssigneeFilter } from "@/components/assignee-filter";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -32,11 +33,15 @@ export function ListView() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [assigneeFilter, setAssigneeFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
+  const assignees = [...new Set(schedules.map((s) => s.assignee).filter(Boolean))];
+
   const filtered = schedules.filter((s) => {
     if (statusFilter !== "all" && s.status !== statusFilter) return false;
+    if (assigneeFilter !== "all" && s.assignee !== assigneeFilter) return false;
     if (search && !s.title.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
@@ -104,6 +109,8 @@ export function ListView() {
           새 일정
         </Button>
       </div>
+
+      <AssigneeFilter assignees={assignees} selected={assigneeFilter} onChange={setAssigneeFilter} />
 
       <div className="overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow-sm">
         <div className="min-w-150">
