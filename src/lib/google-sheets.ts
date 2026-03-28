@@ -149,7 +149,7 @@ export async function getTodos(
   const sheets = getSheets(accessToken);
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: "Todos!A2:F",
+    range: "Todos!A2:G",
   });
 
   const rows = res.data.values || [];
@@ -159,7 +159,8 @@ export async function getTodos(
     title: row[2] || "",
     completed: row[3] === "TRUE",
     order: parseInt(row[4] || "0", 10),
-    createdAt: row[5] || "",
+    assignee: row[5] || "",
+    createdAt: row[6] || "",
   }));
 
   if (scheduleId) {
@@ -175,7 +176,7 @@ export async function appendTodo(
   const sheets = getSheets(accessToken);
   await sheets.spreadsheets.values.append({
     spreadsheetId: SHEET_ID,
-    range: "Todos!A:F",
+    range: "Todos!A:G",
     valueInputOption: "RAW",
     requestBody: {
       values: [
@@ -185,6 +186,7 @@ export async function appendTodo(
           todo.title,
           todo.completed ? "TRUE" : "FALSE",
           todo.order,
+          todo.assignee,
           todo.createdAt,
         ],
       ],
@@ -209,7 +211,7 @@ export async function updateTodo(
   const rowNumber = rowIndex + 1;
   await sheets.spreadsheets.values.update({
     spreadsheetId: SHEET_ID,
-    range: `Todos!A${rowNumber}:F${rowNumber}`,
+    range: `Todos!A${rowNumber}:G${rowNumber}`,
     valueInputOption: "RAW",
     requestBody: {
       values: [
@@ -219,6 +221,7 @@ export async function updateTodo(
           todo.title,
           todo.completed ? "TRUE" : "FALSE",
           todo.order,
+          todo.assignee,
           todo.createdAt,
         ],
       ],

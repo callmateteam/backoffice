@@ -15,6 +15,7 @@ import { useCreateSchedule, useUpdateSchedule } from "@/hooks/use-schedules";
 import { Schedule, ScheduleStatus } from "@/types";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { getMemberList } from "@/lib/members";
 
 const COLORS = [
   { value: "#3b82f6", label: "파랑" },
@@ -222,14 +223,20 @@ export function ScheduleForm({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="assignee">담당자 (이메일)</Label>
-            <Input
+            <Label htmlFor="assignee">담당자</Label>
+            <select
               id="assignee"
-              type="email"
               value={assignee}
               onChange={(e) => setAssignee(e.target.value)}
-              placeholder="담당자 이메일"
-            />
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+            >
+              <option value="">선택 안 함</option>
+              {getMemberList().map((m) => (
+                <option key={m.email} value={m.email}>
+                  {m.name} ({m.email})
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="flex justify-end gap-2 pt-2">

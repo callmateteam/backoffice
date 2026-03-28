@@ -16,6 +16,7 @@ import { Schedule } from "@/types";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { Pencil, Trash2, Calendar, User } from "lucide-react";
+import { getMemberName } from "@/lib/members";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -125,7 +126,7 @@ export function ScheduleDetail({
                 {schedule.assignee && (
                   <div className="flex items-center gap-2 text-sm">
                     <User className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <span>{schedule.assignee}</span>
+                    <span>{getMemberName(schedule.assignee)}</span>
                   </div>
                 )}
               </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { getMemberName } from "@/lib/members";
 import { User } from "lucide-react";
 
 interface AssigneeFilterProps {
@@ -38,7 +39,7 @@ export function AssigneeFilter({ assignees, selected, onChange }: AssigneeFilter
                 : "bg-gray-100 text-gray-500 hover:bg-gray-200"
             )}
           >
-            {a.split("@")[0]}
+            {getMemberName(a)}
           </button>
         ))}
       </div>

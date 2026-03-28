@@ -5,11 +5,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useTodos, useCreateTodo, useUpdateTodo, useDeleteTodo } from "@/hooks/use-todos";
+import { getMemberList, getMemberName } from "@/lib/members";
 import { Plus, Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface TodoListProps {
   scheduleId: string;
 }
+
+const members = getMemberList();
 
 export function TodoList({ scheduleId }: TodoListProps) {
   const { data: todos = [], isLoading } = useTodos(scheduleId);
@@ -17,13 +21,18 @@ export function TodoList({ scheduleId }: TodoListProps) {
   const updateTodo = useUpdateTodo(scheduleId);
   const deleteTodo = useDeleteTodo(scheduleId);
   const [newTitle, setNewTitle] = useState("");
+  const [newAssignee, setNewAssignee] = useState("");
 
   const completed = todos.filter((t) => t.completed).length;
   const total = todos.length;
 
   const handleAdd = async () => {
     if (!newTitle.trim()) return;
-    await createTodo.mutateAsync({ scheduleId, title: newTitle.trim() });
+    await createTodo.mutateAsync({
+      scheduleId,
+      title: newTitle.trim(),
+      assignee: newAssignee,
+    });
     setNewTitle("");
   };
 
@@ -41,13 +50,13 @@ export function TodoList({ scheduleId }: TodoListProps) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium">
+        <span className="text-sm font-semibold text-gray-800">
           할 일 ({completed}/{total})
         </span>
         {total > 0 && (
           <div className="h-2 w-24 overflow-hidden rounded-full bg-gray-200">
             <div
-              className="h-full bg-green-500 transition-all"
+              className="h-full rounded-full bg-linear-to-r from-indigo-500 to-violet-500 transition-all"
               style={{ width: `${total > 0 ? (completed / total) * 100 : 0}%` }}
             />
           </div>
@@ -60,7 +69,7 @@ export function TodoList({ scheduleId }: TodoListProps) {
           .map((todo) => (
             <div
               key={todo.id}
-              className="group flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-gray-50"
+              className="group flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-gray-50"
             >
               <Checkbox
                 checked={todo.completed}
@@ -72,12 +81,18 @@ export function TodoList({ scheduleId }: TodoListProps) {
                 }
               />
               <span
-                className={`flex-1 text-sm ${
-                  todo.completed ? "text-muted-foreground line-through" : ""
-                }`}
+                className={cn(
+                  "flex-1 text-sm",
+                  todo.completed && "text-gray-400 line-through"
+                )}
               >
                 {todo.title}
               </span>
+              {todo.assignee && (
+                <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-[11px] font-medium text-indigo-600">
+                  {getMemberName(todo.assignee)}
+                </span>
+              )}
               <Button
                 variant="ghost"
                 size="sm"
@@ -96,8 +111,20 @@ export function TodoList({ scheduleId }: TodoListProps) {
           onChange={(e) => setNewTitle(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="할 일 추가..."
-          className="h-8 text-sm"
+          className="h-8 flex-1 text-sm"
         />
+        <select
+          value={newAssignee}
+          onChange={(e) => setNewAssignee(e.target.value)}
+          className="h-8 rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-600 outline-none focus:border-indigo-400"
+        >
+          <option value="">담당자</option>
+          {members.map((m) => (
+            <option key={m.email} value={m.email}>
+              {m.name}
+            </option>
+          ))}
+        </select>
         <Button
           size="sm"
           variant="ghost"

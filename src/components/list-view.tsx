@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, ChevronDown, ChevronRight, Search } from "lucide-react";
 import { AssigneeFilter } from "@/components/assignee-filter";
+import { getMemberName } from "@/lib/members";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -164,7 +165,7 @@ export function ListView() {
                   {formatDate(schedule.startDate)} ~ {formatDate(schedule.endDate)}
                 </span>
                 <span className="truncate text-xs text-gray-400">
-                  {schedule.assignee}
+                  {schedule.assignee ? getMemberName(schedule.assignee) : ""}
                 </span>
               </div>
 

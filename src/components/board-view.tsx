@@ -16,6 +16,7 @@ import { ScheduleDetail } from "@/components/schedule-detail";
 import { Schedule, ScheduleStatus } from "@/types";
 import { Button } from "@/components/ui/button";
 import { AssigneeFilter } from "@/components/assignee-filter";
+import { getMemberName } from "@/lib/members";
 import { Plus, GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -55,10 +56,10 @@ function ScheduleCard({
           {schedule.assignee && (
             <div className="mt-2 flex items-center gap-1.5">
               <div className="flex h-5 w-5 items-center justify-center rounded-full bg-linear-to-br from-indigo-400 to-violet-400 text-[10px] font-medium text-white">
-                {schedule.assignee[0]?.toUpperCase()}
+                {getMemberName(schedule.assignee)[0]}
               </div>
               <p className="truncate text-xs text-gray-400">
-                {schedule.assignee}
+                {getMemberName(schedule.assignee)}
               </p>
             </div>
           )}

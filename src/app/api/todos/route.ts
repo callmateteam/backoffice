@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
       title: body.title,
       completed: false,
       order: body.order || 0,
+      assignee: body.assignee || "",
       createdAt: new Date().toISOString(),
     };
 

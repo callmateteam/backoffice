@@ -17,6 +17,7 @@ export interface Todo {
   title: string;
   completed: boolean;
   order: number;
+  assignee: string;
   createdAt: string;
 }
 
@@ -39,6 +40,7 @@ export interface UpdateScheduleInput extends Partial<CreateScheduleInput> {
 export interface CreateTodoInput {
   scheduleId: string;
   title: string;
+  assignee?: string;
 }
 
 export interface UpdateTodoInput {
@@ -46,4 +48,5 @@ export interface UpdateTodoInput {
   title?: string;
   completed?: boolean;
   order?: number;
+  assignee?: string;
 }
