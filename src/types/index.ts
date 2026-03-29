@@ -18,6 +18,7 @@ export interface Todo {
   completed: boolean;
   order: number;
   assignee: string;
+  link: string;
   createdAt: string;
 }
 
@@ -41,6 +42,7 @@ export interface CreateTodoInput {
   scheduleId: string;
   title: string;
   assignee?: string;
+  link?: string;
 }
 
 export interface UpdateTodoInput {
@@ -49,4 +51,5 @@ export interface UpdateTodoInput {
   completed?: boolean;
   order?: number;
   assignee?: string;
+  link?: string;
 }

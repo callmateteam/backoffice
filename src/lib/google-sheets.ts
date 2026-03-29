@@ -1,5 +1,6 @@
 import { google, sheets_v4 } from "googleapis";
 import { Schedule, Todo } from "@/types";
+import { Notice } from "@/types/notice";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 
@@ -149,7 +150,7 @@ export async function getTodos(
   const sheets = getSheets(accessToken);
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: "Todos!A2:G",
+    range: "Todos!A2:H",
   });
 
   const rows = res.data.values || [];
@@ -160,7 +161,8 @@ export async function getTodos(
     completed: row[3] === "TRUE",
     order: parseInt(row[4] || "0", 10),
     assignee: row[5] || "",
-    createdAt: row[6] || "",
+    link: row[6] || "",
+    createdAt: row[7] || "",
   }));
 
   if (scheduleId) {
@@ -176,7 +178,7 @@ export async function appendTodo(
   const sheets = getSheets(accessToken);
   await sheets.spreadsheets.values.append({
     spreadsheetId: SHEET_ID,
-    range: "Todos!A:G",
+    range: "Todos!A:H",
     valueInputOption: "RAW",
     requestBody: {
       values: [
@@ -187,6 +189,7 @@ export async function appendTodo(
           todo.completed ? "TRUE" : "FALSE",
           todo.order,
           todo.assignee,
+          todo.link,
           todo.createdAt,
         ],
       ],
@@ -211,7 +214,7 @@ export async function updateTodo(
   const rowNumber = rowIndex + 1;
   await sheets.spreadsheets.values.update({
     spreadsheetId: SHEET_ID,
-    range: `Todos!A${rowNumber}:G${rowNumber}`,
+    range: `Todos!A${rowNumber}:H${rowNumber}`,
     valueInputOption: "RAW",
     requestBody: {
       values: [
@@ -259,6 +262,91 @@ export async function deleteTodo(
           deleteDimension: {
             range: {
               sheetId,
+              dimension: "ROWS",
+              startIndex: rowIndex,
+              endIndex: rowIndex + 1,
+            },
+          },
+        },
+      ],
+    },
+  });
+}
+
+// --- Notices ---
+
+export async function getNotices(accessToken: string): Promise<Notice[]> {
+  const sheets = getSheets(accessToken);
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: "Notices!A2:E",
+  });
+
+  const rows = res.data.values || [];
+  return rows
+    .map((row) => ({
+      id: row[0] || "",
+      title: row[1] || "",
+      content: row[2] || "",
+      author: row[3] || "",
+      createdAt: row[4] || "",
+    }))
+    .reverse();
+}
+
+export async function appendNotice(
+  accessToken: string,
+  notice: Notice
+): Promise<void> {
+  const sheets = getSheets(accessToken);
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: SHEET_ID,
+    range: "Notices!A:E",
+    valueInputOption: "RAW",
+    requestBody: {
+      values: [
+        [
+          notice.id,
+          notice.title,
+          notice.content,
+          notice.author,
+          notice.createdAt,
+        ],
+      ],
+    },
+  });
+}
+
+export async function deleteNotice(
+  accessToken: string,
+  id: string
+): Promise<void> {
+  const sheets = getSheets(accessToken);
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: "Notices!A:A",
+  });
+
+  const rows = res.data.values || [];
+  const rowIndex = rows.findIndex((row) => row[0] === id);
+  if (rowIndex === -1) throw new Error("Notice not found");
+
+  const spreadsheet = await sheets.spreadsheets.get({
+    spreadsheetId: SHEET_ID,
+  });
+  const noticesSheet = spreadsheet.data.sheets?.find(
+    (s) => s.properties?.title === "Notices"
+  );
+  const noticeSheetId = noticesSheet?.properties?.sheetId || 0;
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: SHEET_ID,
+    requestBody: {
+      requests: [
+        {
+          deleteDimension: {
+            range: {
+              sheetId: noticeSheetId,
               dimension: "ROWS",
               startIndex: rowIndex,
               endIndex: rowIndex + 1,

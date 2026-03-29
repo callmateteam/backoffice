@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useTodos, useCreateTodo, useUpdateTodo, useDeleteTodo } from "@/hooks/use-todos";
 import { getMemberList, getMemberName } from "@/lib/members";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, ExternalLink, Link as LinkIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TodoListProps {
@@ -22,6 +22,8 @@ export function TodoList({ scheduleId }: TodoListProps) {
   const deleteTodo = useDeleteTodo(scheduleId);
   const [newTitle, setNewTitle] = useState("");
   const [newAssignee, setNewAssignee] = useState("");
+  const [newLink, setNewLink] = useState("");
+  const [showLinkInput, setShowLinkInput] = useState(false);
 
   const completed = todos.filter((t) => t.completed).length;
   const total = todos.length;
@@ -32,8 +34,11 @@ export function TodoList({ scheduleId }: TodoListProps) {
       scheduleId,
       title: newTitle.trim(),
       assignee: newAssignee,
+      link: newLink.trim(),
     });
     setNewTitle("");
+    setNewLink("");
+    setShowLinkInput(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -88,6 +93,18 @@ export function TodoList({ scheduleId }: TodoListProps) {
               >
                 {todo.title}
               </span>
+              {todo.link && (
+                <a
+                  href={todo.link.startsWith("http") ? todo.link : `https://${todo.link}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-md p-1 text-indigo-500 transition-colors hover:bg-indigo-50 hover:text-indigo-700"
+                  title={todo.link}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              )}
               {todo.assignee && (
                 <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-[11px] font-medium text-indigo-600">
                   {getMemberName(todo.assignee)}
@@ -105,35 +122,55 @@ export function TodoList({ scheduleId }: TodoListProps) {
           ))}
       </div>
 
-      <div className="flex items-center gap-2">
-        <Input
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="할 일 추가..."
-          className="h-8 flex-1 text-sm"
-        />
-        <select
-          value={newAssignee}
-          onChange={(e) => setNewAssignee(e.target.value)}
-          className="h-8 rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-600 outline-none focus:border-indigo-400"
-        >
-          <option value="">담당자</option>
-          {members.map((m) => (
-            <option key={m.email} value={m.email}>
-              {m.name}
-            </option>
-          ))}
-        </select>
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={handleAdd}
-          disabled={!newTitle.trim() || createTodo.isPending}
-          className="h-8 w-8 p-0"
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <Input
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="할 일 추가..."
+            className="h-8 flex-1 text-sm"
+          />
+          <select
+            value={newAssignee}
+            onChange={(e) => setNewAssignee(e.target.value)}
+            className="h-8 rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-600 outline-none focus:border-indigo-400"
+          >
+            <option value="">담당자</option>
+            {members.map((m) => (
+              <option key={m.email} value={m.email}>
+                {m.name}
+              </option>
+            ))}
+          </select>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setShowLinkInput(!showLinkInput)}
+            className={cn("h-8 w-8 p-0", showLinkInput && "text-indigo-600")}
+            title="링크 추가"
+          >
+            <LinkIcon className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={handleAdd}
+            disabled={!newTitle.trim() || createTodo.isPending}
+            className="h-8 w-8 p-0"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
+        {showLinkInput && (
+          <Input
+            value={newLink}
+            onChange={(e) => setNewLink(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="https://..."
+            className="h-8 text-sm"
+          />
+        )}
       </div>
     </div>
   );

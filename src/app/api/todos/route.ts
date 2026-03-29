@@ -39,6 +39,7 @@ export async function POST(request: NextRequest) {
       completed: false,
       order: body.order || 0,
       assignee: body.assignee || "",
+      link: body.link || "",
       createdAt: new Date().toISOString(),
     };
 
