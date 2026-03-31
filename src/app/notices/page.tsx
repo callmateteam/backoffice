@@ -132,7 +132,7 @@ function NoticesContent({ userEmail }: { userEmail: string }) {
 
       {/* 작성 모달 */}
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>공지사항 작성</DialogTitle>
           </DialogHeader>
@@ -169,7 +169,7 @@ function NoticesContent({ userEmail }: { userEmail: string }) {
 
       {/* 상세 모달 */}
       <Dialog open={!!selectedNotice} onOpenChange={() => setSelectedNotice(null)}>
-        <DialogContent className="sm:max-w-lg" showCloseButton={false}>
+        <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto" showCloseButton={false}>
           {selectedNotice && (
             <>
               <DialogHeader>
