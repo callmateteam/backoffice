@@ -30,6 +30,16 @@ export default function NoticesPage() {
   return <NoticesContent userEmail={session.user?.email || ""} />;
 }
 
+function decodeHtml(html: string): string {
+  return html
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, " ");
+}
+
 function NoticesContent({ userEmail }: { userEmail: string }) {
   const { data: notices = [], isLoading } = useNotices();
   const createNotice = useCreateNotice();
@@ -114,7 +124,7 @@ function NoticesContent({ userEmail }: { userEmail: string }) {
                   <div className="min-w-0 flex-1">
                     <h3 className="font-semibold text-gray-900">{notice.title}</h3>
                     <p className="mt-1.5 line-clamp-2 text-sm text-gray-500">
-                      {notice.content.replace(/<[^>]*>/g, "")}
+                      {decodeHtml(notice.content).replace(/<[^>]*>/g, "")}
                     </p>
                   </div>
                   <div className="shrink-0 text-right">
@@ -196,7 +206,7 @@ function NoticesContent({ userEmail }: { userEmail: string }) {
                 </div>
                 <div
                   className="notice-content text-sm leading-relaxed text-gray-700"
-                  dangerouslySetInnerHTML={{ __html: selectedNotice.content }}
+                  dangerouslySetInnerHTML={{ __html: decodeHtml(selectedNotice.content) }}
                 />
               </div>
             </>
