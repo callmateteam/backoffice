@@ -6,8 +6,8 @@ import { useState } from "react";
 import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { RichEditor } from "@/components/rich-editor";
 import {
   Dialog,
   DialogContent,
@@ -114,7 +114,7 @@ function NoticesContent({ userEmail }: { userEmail: string }) {
                   <div className="min-w-0 flex-1">
                     <h3 className="font-semibold text-gray-900">{notice.title}</h3>
                     <p className="mt-1.5 line-clamp-2 text-sm text-gray-500">
-                      {notice.content}
+                      {notice.content.replace(/<[^>]*>/g, "")}
                     </p>
                   </div>
                   <div className="shrink-0 text-right">
@@ -148,13 +148,11 @@ function NoticesContent({ userEmail }: { userEmail: string }) {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="notice-content">내용</Label>
-              <Textarea
-                id="notice-content"
+              <Label>내용</Label>
+              <RichEditor
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
+                onChange={setContent}
                 placeholder="공지 내용을 입력하세요"
-                rows={6}
               />
             </div>
             <div className="flex justify-end gap-2 pt-2">
@@ -196,9 +194,10 @@ function NoticesContent({ userEmail }: { userEmail: string }) {
                   </span>
                   <span>{formatDate(selectedNotice.createdAt)}</span>
                 </div>
-                <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
-                  {selectedNotice.content}
-                </p>
+                <div
+                  className="notice-content text-sm leading-relaxed text-gray-700"
+                  dangerouslySetInnerHTML={{ __html: selectedNotice.content }}
+                />
               </div>
             </>
           )}
