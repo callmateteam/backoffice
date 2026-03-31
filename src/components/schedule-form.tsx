@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,13 +19,10 @@ import { cn } from "@/lib/utils";
 import { getMemberList } from "@/lib/members";
 
 const COLORS = [
-  { value: "#3b82f6", label: "파랑" },
-  { value: "#ef4444", label: "빨강" },
-  { value: "#22c55e", label: "초록" },
-  { value: "#f59e0b", label: "노랑" },
-  { value: "#8b5cf6", label: "보라" },
-  { value: "#ec4899", label: "핑크" },
-  { value: "#6b7280", label: "회색" },
+  "#3b82f6", "#6366f1", "#8b5cf6", "#a855f7",
+  "#ec4899", "#f43f5e", "#ef4444", "#f97316",
+  "#f59e0b", "#eab308", "#84cc16", "#22c55e",
+  "#14b8a6", "#06b6d4", "#6b7280",
 ];
 
 const STATUSES: { value: ScheduleStatus; label: string }[] = [
@@ -49,26 +47,42 @@ export function ScheduleForm({
   const isEdit = !!schedule;
   const createSchedule = useCreateSchedule();
   const updateSchedule = useUpdateSchedule();
+  const router = useRouter();
+  const members = getMemberList();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [startDate, setStartDate] = useState("");
+  const [startTime, setStartTime] = useState("09:00");
   const [endDate, setEndDate] = useState("");
+  const [endTime, setEndTime] = useState("18:00");
   const [status, setStatus] = useState<ScheduleStatus>("todo");
   const [color, setColor] = useState("#3b82f6");
-  const [assignee, setAssignee] = useState("");
+  const [assignees, setAssignees] = useState<string[]>([]);
 
   useEffect(() => {
     if (open) {
       setTitle(schedule?.title || "");
       setDescription(schedule?.description || "");
-      setStartDate(schedule?.startDate || defaultDate || "");
-      setEndDate(schedule?.endDate || defaultDate || "");
+
+      const sd = schedule?.startDate || defaultDate || "";
+      const ed = schedule?.endDate || defaultDate || "";
+      setStartDate(sd.split("T")[0] || "");
+      setStartTime(sd.includes("T") ? sd.split("T")[1]?.substring(0, 5) || "09:00" : "09:00");
+      setEndDate(ed.split("T")[0] || "");
+      setEndTime(ed.includes("T") ? ed.split("T")[1]?.substring(0, 5) || "18:00" : "18:00");
+
       setStatus(schedule?.status || "todo");
       setColor(schedule?.color || "#3b82f6");
-      setAssignee(schedule?.assignee || "");
+      setAssignees(schedule?.assignee ? schedule.assignee.split(",").filter(Boolean) : []);
     }
   }, [open, schedule, defaultDate]);
+
+  const toggleAssignee = (email: string) => {
+    setAssignees((prev) =>
+      prev.includes(email) ? prev.filter((a) => a !== email) : [...prev, email]
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,30 +91,39 @@ export function ScheduleForm({
       return;
     }
 
+    const fullStartDate = `${startDate}T${startTime}`;
+    const fullEndDate = `${endDate}T${endTime}`;
+    const assigneeStr = assignees.join(",");
+
     try {
       if (isEdit && schedule) {
         await updateSchedule.mutateAsync({
           id: schedule.id,
           title,
           description,
-          startDate,
-          endDate,
+          startDate: fullStartDate,
+          endDate: fullEndDate,
           status,
           color,
-          assignee,
+          assignee: assigneeStr,
         });
         toast.success("일정이 수정되었습니다.");
       } else {
-        await createSchedule.mutateAsync({
+        const result = await createSchedule.mutateAsync({
           title,
           description,
-          startDate,
-          endDate,
+          startDate: fullStartDate,
+          endDate: fullEndDate,
           status,
           color,
-          assignee,
+          assignee: assigneeStr,
         });
-        toast.success("일정이 등록되었습니다.");
+        toast.success("일정이 등록되었습니다.", {
+          action: {
+            label: "일정 보기",
+            onClick: () => router.push("/calendar"),
+          },
+        });
       }
       onOpenChange(false);
     } catch {
@@ -110,7 +133,7 @@ export function ScheduleForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEdit ? "일정 수정" : "새 일정"}</DialogTitle>
         </DialogHeader>
@@ -139,42 +162,30 @@ export function ScheduleForm({
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label>시작일 *</Label>
+              <Label>시작</Label>
               <Input
                 type="date"
-                value={startDate.split("T")[0]}
-                onChange={(e) => {
-                  const time = startDate.includes("T") ? startDate.split("T")[1] : "09:00";
-                  setStartDate(`${e.target.value}T${time}`);
-                }}
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
               />
               <Input
                 type="time"
-                value={startDate.includes("T") ? startDate.split("T")[1]?.substring(0, 5) : "09:00"}
-                onChange={(e) => {
-                  const date = startDate.split("T")[0];
-                  setStartDate(`${date}T${e.target.value}`);
-                }}
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
                 className="mt-1"
               />
             </div>
             <div className="space-y-1.5">
-              <Label>종료일 *</Label>
+              <Label>종료</Label>
               <Input
                 type="date"
-                value={endDate.split("T")[0]}
-                onChange={(e) => {
-                  const time = endDate.includes("T") ? endDate.split("T")[1] : "18:00";
-                  setEndDate(`${e.target.value}T${time}`);
-                }}
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
               />
               <Input
                 type="time"
-                value={endDate.includes("T") ? endDate.split("T")[1]?.substring(0, 5) : "18:00"}
-                onChange={(e) => {
-                  const date = endDate.split("T")[0];
-                  setEndDate(`${date}T${e.target.value}`);
-                }}
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
                 className="mt-1"
               />
             </div>
@@ -203,40 +214,43 @@ export function ScheduleForm({
 
           <div className="space-y-1.5">
             <Label>색상</Label>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {COLORS.map((c) => (
                 <button
-                  key={c.value}
+                  key={c}
                   type="button"
-                  onClick={() => setColor(c.value)}
+                  onClick={() => setColor(c)}
                   className={cn(
-                    "h-8 w-8 rounded-full border-2 transition-transform",
-                    color === c.value
+                    "h-7 w-7 rounded-full border-2 transition-transform",
+                    color === c
                       ? "scale-110 border-gray-900"
                       : "border-transparent hover:scale-105"
                   )}
-                  style={{ backgroundColor: c.value }}
-                  title={c.label}
+                  style={{ backgroundColor: c }}
                 />
               ))}
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="assignee">담당자</Label>
-            <select
-              id="assignee"
-              value={assignee}
-              onChange={(e) => setAssignee(e.target.value)}
-              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
-            >
-              <option value="">선택 안 함</option>
-              {getMemberList().map((m) => (
-                <option key={m.email} value={m.email}>
-                  {m.name} ({m.email})
-                </option>
+            <Label>담당자 (복수 선택)</Label>
+            <div className="flex flex-wrap gap-2">
+              {members.map((m) => (
+                <button
+                  key={m.email}
+                  type="button"
+                  onClick={() => toggleAssignee(m.email)}
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-sm font-medium transition-all",
+                    assignees.includes(m.email)
+                      ? "border-indigo-600 bg-indigo-600 text-white shadow-sm shadow-indigo-200"
+                      : "border-gray-200 bg-white text-gray-500 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
+                  )}
+                >
+                  {m.name}
+                </button>
               ))}
-            </select>
+            </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-2">

@@ -126,7 +126,13 @@ export function ScheduleDetail({
                 {schedule.assignee && (
                   <div className="flex items-center gap-2 text-sm">
                     <User className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <span>{getMemberName(schedule.assignee)}</span>
+                    <div className="flex flex-wrap gap-1">
+                      {schedule.assignee.split(",").filter(Boolean).map((a) => (
+                        <span key={a} className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-600">
+                          {getMemberName(a)}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>

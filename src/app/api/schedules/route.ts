@@ -4,7 +4,6 @@ import { getSchedules, appendSchedule } from "@/lib/google-sheets";
 import { Schedule } from "@/types";
 import { v4 as uuidv4 } from "uuid";
 import { notifyNewSchedule } from "@/lib/discord";
-import { getMemberName } from "@/lib/members";
 
 export async function GET() {
   const session = await getAuthSession();
@@ -47,7 +46,7 @@ export async function POST(request: NextRequest) {
     };
 
     await appendSchedule(session.accessToken, schedule);
-    notifyNewSchedule(schedule.title, getMemberName(schedule.assignee), schedule.startDate, schedule.endDate);
+    notifyNewSchedule(schedule.title, schedule.assignee, schedule.startDate, schedule.endDate);
     return NextResponse.json(schedule, { status: 201 });
   } catch (error) {
     console.error("Failed to create schedule:", error);

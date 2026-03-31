@@ -54,13 +54,15 @@ function ScheduleCard({
             </p>
           )}
           {schedule.assignee && (
-            <div className="mt-2 flex items-center gap-1.5">
-              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-linear-to-br from-indigo-400 to-violet-400 text-[10px] font-medium text-white">
-                {getMemberName(schedule.assignee)[0]}
-              </div>
-              <p className="truncate text-xs text-gray-400">
-                {getMemberName(schedule.assignee)}
-              </p>
+            <div className="mt-2 flex flex-wrap gap-1">
+              {schedule.assignee.split(",").filter(Boolean).map((a) => (
+                <div key={a} className="flex items-center gap-1">
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-linear-to-br from-indigo-400 to-violet-400 text-[10px] font-medium text-white">
+                    {getMemberName(a)[0]}
+                  </div>
+                  <span className="text-xs text-gray-400">{getMemberName(a)}</span>
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -78,10 +80,10 @@ export function BoardView() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [assigneeFilter, setAssigneeFilter] = useState("all");
 
-  const assignees = [...new Set(schedules.map((s) => s.assignee).filter(Boolean))];
+  const assignees = [...new Set(schedules.flatMap((s) => s.assignee?.split(",") || []).filter(Boolean))];
   const filteredSchedules = assigneeFilter === "all"
     ? schedules
-    : schedules.filter((s) => s.assignee === assigneeFilter);
+    : schedules.filter((s) => s.assignee?.split(",").includes(assigneeFilter));
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })

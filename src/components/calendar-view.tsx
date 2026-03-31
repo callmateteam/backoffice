@@ -21,10 +21,10 @@ export function CalendarView() {
   const [defaultDate, setDefaultDate] = useState<string>("");
   const [assigneeFilter, setAssigneeFilter] = useState("all");
 
-  const assignees = [...new Set(schedules.map((s) => s.assignee).filter(Boolean))];
+  const assignees = [...new Set(schedules.flatMap((s) => s.assignee?.split(",") || []).filter(Boolean))];
   const filteredSchedules = assigneeFilter === "all"
     ? schedules
-    : schedules.filter((s) => s.assignee === assigneeFilter);
+    : schedules.filter((s) => s.assignee?.split(",").includes(assigneeFilter));
 
   const events = filteredSchedules.map((s) => ({
     id: s.id,

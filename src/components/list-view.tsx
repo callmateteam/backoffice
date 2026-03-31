@@ -38,11 +38,11 @@ export function ListView() {
   const [search, setSearch] = useState("");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
-  const assignees = [...new Set(schedules.map((s) => s.assignee).filter(Boolean))];
+  const assignees = [...new Set(schedules.flatMap((s) => s.assignee?.split(",") || []).filter(Boolean))];
 
   const filtered = schedules.filter((s) => {
     if (statusFilter !== "all" && s.status !== statusFilter) return false;
-    if (assigneeFilter !== "all" && s.assignee !== assigneeFilter) return false;
+    if (assigneeFilter !== "all" && !s.assignee?.split(",").includes(assigneeFilter)) return false;
     if (search && !s.title.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
@@ -164,9 +164,11 @@ export function ListView() {
                 <span className="text-xs text-gray-400">
                   {formatDate(schedule.startDate)} ~ {formatDate(schedule.endDate)}
                 </span>
-                <span className="truncate text-xs text-gray-400">
-                  {schedule.assignee ? getMemberName(schedule.assignee) : ""}
-                </span>
+                <div className="flex flex-wrap gap-1">
+                  {schedule.assignee?.split(",").filter(Boolean).map((a) => (
+                    <span key={a} className="text-xs text-gray-400">{getMemberName(a)}</span>
+                  ))}
+                </div>
               </div>
 
               {isExpanded && (
