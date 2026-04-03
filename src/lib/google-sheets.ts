@@ -1,6 +1,7 @@
 import { google, sheets_v4 } from "googleapis";
 import { Schedule, Todo } from "@/types";
 import { Notice } from "@/types/notice";
+import { Meeting } from "@/types/meeting";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 
@@ -347,6 +348,136 @@ export async function deleteNotice(
           deleteDimension: {
             range: {
               sheetId: noticeSheetId,
+              dimension: "ROWS",
+              startIndex: rowIndex,
+              endIndex: rowIndex + 1,
+            },
+          },
+        },
+      ],
+    },
+  });
+}
+
+// --- Meetings ---
+
+export async function getMeetings(accessToken: string): Promise<Meeting[]> {
+  const sheets = getSheets(accessToken);
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: "Meetings!A2:I",
+  });
+
+  const rows = res.data.values || [];
+  return rows
+    .map((row) => ({
+      id: row[0] || "",
+      title: row[1] || "",
+      date: row[2] || "",
+      startTime: row[3] || "",
+      endTime: row[4] || "",
+      participants: row[5] || "",
+      agenda: row[6] || "",
+      minutes: row[7] || "",
+      createdAt: row[8] || "",
+    }))
+    .reverse();
+}
+
+export async function appendMeeting(
+  accessToken: string,
+  meeting: Meeting
+): Promise<void> {
+  const sheets = getSheets(accessToken);
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: SHEET_ID,
+    range: "Meetings!A:I",
+    valueInputOption: "RAW",
+    requestBody: {
+      values: [
+        [
+          meeting.id,
+          meeting.title,
+          meeting.date,
+          meeting.startTime,
+          meeting.endTime,
+          meeting.participants,
+          meeting.agenda,
+          meeting.minutes,
+          meeting.createdAt,
+        ],
+      ],
+    },
+  });
+}
+
+export async function updateMeeting(
+  accessToken: string,
+  meeting: Meeting
+): Promise<void> {
+  const sheets = getSheets(accessToken);
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: "Meetings!A:A",
+  });
+
+  const rows = res.data.values || [];
+  const rowIndex = rows.findIndex((row) => row[0] === meeting.id);
+  if (rowIndex === -1) throw new Error("Meeting not found");
+
+  const rowNumber = rowIndex + 1;
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: SHEET_ID,
+    range: `Meetings!A${rowNumber}:I${rowNumber}`,
+    valueInputOption: "RAW",
+    requestBody: {
+      values: [
+        [
+          meeting.id,
+          meeting.title,
+          meeting.date,
+          meeting.startTime,
+          meeting.endTime,
+          meeting.participants,
+          meeting.agenda,
+          meeting.minutes,
+          meeting.createdAt,
+        ],
+      ],
+    },
+  });
+}
+
+export async function deleteMeeting(
+  accessToken: string,
+  id: string
+): Promise<void> {
+  const sheets = getSheets(accessToken);
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: "Meetings!A:A",
+  });
+
+  const rows = res.data.values || [];
+  const rowIndex = rows.findIndex((row) => row[0] === id);
+  if (rowIndex === -1) throw new Error("Meeting not found");
+
+  const spreadsheet = await sheets.spreadsheets.get({
+    spreadsheetId: SHEET_ID,
+  });
+  const meetingsSheet = spreadsheet.data.sheets?.find(
+    (s) => s.properties?.title === "Meetings"
+  );
+  const meetingSheetId = meetingsSheet?.properties?.sheetId || 0;
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: SHEET_ID,
+    requestBody: {
+      requests: [
+        {
+          deleteDimension: {
+            range: {
+              sheetId: meetingSheetId,
               dimension: "ROWS",
               startIndex: rowIndex,
               endIndex: rowIndex + 1,

@@ -1,6 +1,7 @@
 import { getMemberName } from "@/lib/members";
 
 const WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
+const MEETING_WEBHOOK_URL = process.env.DISCORD_MEETING_WEBHOOK_URL;
 
 interface DiscordEmbed {
   title: string;
@@ -10,10 +11,11 @@ interface DiscordEmbed {
   timestamp?: string;
 }
 
-async function sendDiscord(embed: DiscordEmbed) {
-  if (!WEBHOOK_URL) return;
+async function sendDiscord(embed: DiscordEmbed, webhookUrl?: string) {
+  const url = webhookUrl || WEBHOOK_URL;
+  if (!url) return;
   try {
-    await fetch(WEBHOOK_URL, {
+    await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ embeds: [embed] }),
@@ -26,13 +28,11 @@ async function sendDiscord(embed: DiscordEmbed) {
 function formatKST(dateStr: string): { date: string; time: string } {
   try {
     const d = new Date(dateStr);
-    // UTC → KST (+9)
     const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
     const date = `${kst.getFullYear()}.${String(kst.getMonth() + 1).padStart(2, "0")}.${String(kst.getDate()).padStart(2, "0")}`;
     const time = `${String(kst.getHours()).padStart(2, "0")}:${String(kst.getMinutes()).padStart(2, "0")}`;
     return { date, time };
   } catch {
-    // dateStr이 이미 로컬 시간 형식일 경우
     const [datePart, timePart] = dateStr.split("T");
     return { date: datePart || dateStr, time: timePart?.substring(0, 5) || "" };
   }
@@ -87,4 +87,31 @@ export async function notifyNewTodo(scheduleTitle: string, todoTitle: string, as
     ],
     timestamp: new Date().toISOString(),
   });
+}
+
+export async function notifyMeetingReminder(title: string, date: string, startTime: string, endTime: string, participants: string) {
+  await sendDiscord({
+    title: "🔔 회의 1시간 전 알림",
+    color: 0xf59e0b,
+    fields: [
+      { name: "제목", value: title },
+      { name: "날짜", value: date, inline: true },
+      { name: "시간", value: `${startTime} ~ ${endTime}`, inline: true },
+      { name: "참여자", value: formatAssignees(participants) },
+    ],
+    timestamp: new Date().toISOString(),
+  }, MEETING_WEBHOOK_URL || undefined);
+}
+
+export async function notifyMeetingMinutes(title: string, author: string, siteUrl: string) {
+  await sendDiscord({
+    title: "📝 회의록 작성 완료",
+    color: 0x22c55e,
+    fields: [
+      { name: "제목", value: title, inline: true },
+      { name: "작성자", value: getMemberName(author), inline: true },
+      { name: "확인", value: `[백오피스에서 확인하기](${siteUrl}/meetings)` },
+    ],
+    timestamp: new Date().toISOString(),
+  }, MEETING_WEBHOOK_URL || undefined);
 }
