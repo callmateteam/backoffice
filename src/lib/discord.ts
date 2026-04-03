@@ -89,6 +89,20 @@ export async function notifyNewTodo(scheduleTitle: string, todoTitle: string, as
   });
 }
 
+export async function notifyNewMeeting(title: string, date: string, startTime: string, endTime: string, participants: string) {
+  await sendDiscord({
+    title: "📅 새 회의 등록",
+    color: 0x4f46e5,
+    fields: [
+      { name: "제목", value: title },
+      { name: "날짜", value: date, inline: true },
+      { name: "시간", value: `${startTime} ~ ${endTime}`, inline: true },
+      { name: "참여자", value: formatAssignees(participants) },
+    ],
+    timestamp: new Date().toISOString(),
+  }, MEETING_WEBHOOK_URL || undefined);
+}
+
 export async function notifyMeetingReminder(title: string, date: string, startTime: string, endTime: string, participants: string) {
   await sendDiscord({
     title: "🔔 회의 1시간 전 알림",
