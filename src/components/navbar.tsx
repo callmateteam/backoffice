@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CalendarDays, LayoutGrid, List, LayoutDashboard, LogOut, Menu, X, Megaphone, FileText } from "lucide-react";
+import { CalendarDays, LayoutGrid, List, LayoutDashboard, LogOut, Menu, X, Megaphone, FileText, ClipboardList } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -21,6 +21,7 @@ const navItems = [
   { href: "/list", label: "리스트", icon: List },
   { href: "/notices", label: "공지사항", icon: Megaphone },
   { href: "/meetings", label: "회의록", icon: FileText },
+  { href: "/worklogs", label: "업무일지", icon: ClipboardList },
 ];
 
 export function Navbar() {

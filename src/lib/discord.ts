@@ -129,3 +129,30 @@ export async function notifyMeetingMinutes(title: string, author: string, siteUr
     timestamp: new Date().toISOString(),
   }, MEETING_WEBHOOK_URL || undefined);
 }
+
+export async function notifyWorkLogReminder(siteUrl: string) {
+  const webhookUrl = process.env.DISCORD_WORKLOG_WEBHOOK_URL;
+  await sendDiscord({
+    title: "📋 업무일지 작성 알림",
+    description: "오늘 하루 업무 내용을 정리해주세요!",
+    color: 0xf59e0b,
+    fields: [
+      { name: "작성하기", value: `[백오피스에서 작성하기](${siteUrl}/worklogs)` },
+    ],
+    timestamp: new Date().toISOString(),
+  }, webhookUrl || undefined);
+}
+
+export async function notifyWorkLogWritten(date: string, author: string, summary: string) {
+  const webhookUrl = process.env.DISCORD_WORKLOG_WEBHOOK_URL;
+  await sendDiscord({
+    title: `📝 업무일지 작성 — ${getMemberName(author)}`,
+    color: 0x4f46e5,
+    fields: [
+      { name: "날짜", value: date, inline: true },
+      { name: "작성자", value: getMemberName(author), inline: true },
+      { name: "요약", value: summary || "(내용 없음)" },
+    ],
+    timestamp: new Date().toISOString(),
+  }, webhookUrl || undefined);
+}

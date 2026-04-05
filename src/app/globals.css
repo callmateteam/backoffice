@@ -229,3 +229,10 @@
 .notice-content em { font-style: italic; }
 .notice-content s { text-decoration: line-through; }
 .notice-content u { text-decoration: underline; }
+
+/* 마크다운 렌더링 (업무일지) */
+.md-content h2 { font-size: 1rem; font-weight: 700; color: #1a1a2e; margin: 16px 0 8px; padding-bottom: 6px; border-bottom: 2px solid #f0efff; }
+.md-content h2:first-child { margin-top: 0; }
+.md-content h3 { font-size: 0.9rem; font-weight: 600; color: #4f46e5; margin: 12px 0 6px; }
+.md-content code { background: #f0efff; color: #4f46e5; padding: 1px 6px; border-radius: 4px; font-size: 0.85em; }
+.md-content li::marker { color: #c7d2fe; }

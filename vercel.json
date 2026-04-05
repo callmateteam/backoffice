@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/worklog-reminder",
+      "schedule": "0 14 * * *"
+    }
+  ]
+}

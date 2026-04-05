@@ -2,6 +2,7 @@ import { google, sheets_v4 } from "googleapis";
 import { Schedule, Todo } from "@/types";
 import { Notice } from "@/types/notice";
 import { Meeting } from "@/types/meeting";
+import { WorkLog } from "@/types/worklog";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 
@@ -485,6 +486,67 @@ export async function deleteMeeting(
           },
         },
       ],
+    },
+  });
+}
+
+// --- WorkLogs ---
+
+export async function getWorkLogs(accessToken: string): Promise<WorkLog[]> {
+  const sheets = getSheets(accessToken);
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: "WorkLogs!A2:E",
+  });
+
+  const rows = res.data.values || [];
+  return rows
+    .map((row) => ({
+      id: row[0] || "",
+      date: row[1] || "",
+      author: row[2] || "",
+      content: row[3] || "",
+      createdAt: row[4] || "",
+    }))
+    .reverse();
+}
+
+export async function appendWorkLog(
+  accessToken: string,
+  log: WorkLog
+): Promise<void> {
+  const sheets = getSheets(accessToken);
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: SHEET_ID,
+    range: "WorkLogs!A:E",
+    valueInputOption: "RAW",
+    requestBody: {
+      values: [[log.id, log.date, log.author, log.content, log.createdAt]],
+    },
+  });
+}
+
+export async function updateWorkLog(
+  accessToken: string,
+  log: WorkLog
+): Promise<void> {
+  const sheets = getSheets(accessToken);
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: "WorkLogs!A:A",
+  });
+
+  const rows = res.data.values || [];
+  const rowIndex = rows.findIndex((row) => row[0] === log.id);
+  if (rowIndex === -1) throw new Error("WorkLog not found");
+
+  const rowNumber = rowIndex + 1;
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: SHEET_ID,
+    range: `WorkLogs!A${rowNumber}:E${rowNumber}`,
+    valueInputOption: "RAW",
+    requestBody: {
+      values: [[log.id, log.date, log.author, log.content, log.createdAt]],
     },
   });
 }
