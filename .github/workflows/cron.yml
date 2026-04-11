@@ -1,0 +1,53 @@
+name: Scheduled Tasks
+
+on:
+  schedule:
+    # 매일 08:00 KST (23:00 UTC 전날) — Threads 초안 생성
+    - cron: '0 23 * * *'
+    # 매 30분 — Threads 발행 체크
+    - cron: '*/30 * * * *'
+    # 매시간 정각 — Threads 댓글/대댓글 수집 + AI 답글 생성
+    - cron: '0 * * * *'
+    # 매일 23:00 KST (14:00 UTC) — 업무일지 리마인더
+    - cron: '0 14 * * *'
+  workflow_dispatch: # 수동 실행 가능
+
+jobs:
+  threads-generate:
+    if: github.event.schedule == '0 23 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Threads Drafts
+        run: |
+          curl -s -X POST "${{ secrets.DEPLOY_URL }}/api/cron/threads-generate" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"
+
+  threads-publish:
+    if: github.event.schedule == '*/30 * * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish Approved Threads
+        run: |
+          curl -s -X POST "${{ secrets.DEPLOY_URL }}/api/cron/threads-publish" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"
+
+  threads-replies:
+    if: github.event.schedule == '0 * * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Replies & Generate AI Drafts
+        run: |
+          curl -s -X POST "${{ secrets.DEPLOY_URL }}/api/cron/threads-replies" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"
+
+  worklog-reminder:
+    if: github.event.schedule == '0 14 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Worklog Reminder
+        run: |
+          curl -s -X GET "${{ secrets.DEPLOY_URL }}/api/cron/worklog-reminder" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

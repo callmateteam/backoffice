@@ -1,20 +1,2 @@
 {
-  "crons": [
-    {
-      "path": "/api/cron/worklog-reminder",
-      "schedule": "0 14 * * *"
-    },
-    {
-      "path": "/api/cron/threads-generate",
-      "schedule": "0 23 * * *"
-    },
-    {
-      "path": "/api/cron/threads-publish",
-      "schedule": "*/30 * * * *"
-    },
-    {
-      "path": "/api/cron/threads-replies",
-      "schedule": "0 * * * *"
-    }
-  ]
 }
