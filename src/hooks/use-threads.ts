@@ -64,6 +64,22 @@ export function useUpdateThreadPost() {
   });
 }
 
+export function usePublishNow() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (pageId: string) => {
+      const res = await fetch("/api/threads/publish-now", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pageId }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["threads"] }),
+  });
+}
+
 export function useUpdateReplyDraft() {
   const queryClient = useQueryClient();
   return useMutation({

@@ -18,6 +18,7 @@ import {
   useDeleteThreadPost,
   useUpdateReplyDraft,
   usePublishReply,
+  usePublishNow,
   type ThreadPost,
 } from "@/hooks/use-threads";
 import {
@@ -76,6 +77,7 @@ function ThreadsContent() {
   const deletePost = useDeleteThreadPost();
   const updateReplyDraft = useUpdateReplyDraft();
   const publishReply = usePublishReply();
+  const publishNow = usePublishNow();
   const [selectedPost, setSelectedPost] = useState<ThreadPost | null>(null);
   const [editContent, setEditContent] = useState("");
   const [filter, setFilter] = useState<string>("all");
@@ -275,6 +277,25 @@ function ThreadsContent() {
                             <X className="h-4 w-4" />
                           </Button>
                         </div>
+                      )}
+                      {post.status === "승인" && (
+                        <Button
+                          size="sm"
+                          className="mt-2 h-7 bg-indigo-600 text-xs hover:bg-indigo-700"
+                          disabled={publishNow.isPending}
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            try {
+                              await publishNow.mutateAsync(post.id);
+                              toast.success("발행 완료!");
+                            } catch {
+                              toast.error("발행 실패");
+                            }
+                          }}
+                        >
+                          <Send className="mr-1 h-3 w-3" />
+                          발행
+                        </Button>
                       )}
                     </div>
                   </div>
@@ -584,6 +605,25 @@ function ThreadsContent() {
                           승인
                         </Button>
                       </>
+                    )}
+                    {selectedPost.status === "승인" && (
+                      <Button
+                        size="sm"
+                        className="bg-indigo-600 hover:bg-indigo-700"
+                        disabled={publishNow.isPending}
+                        onClick={async () => {
+                          try {
+                            await publishNow.mutateAsync(selectedPost.id);
+                            toast.success("Threads에 발행 완료!");
+                            setSelectedPost(null);
+                          } catch {
+                            toast.error("발행 실패");
+                          }
+                        }}
+                      >
+                        <Send className="mr-1 h-4 w-4" />
+                        {publishNow.isPending ? "발행 중..." : "지금 발행"}
+                      </Button>
                     )}
                   </div>
                 </div>
