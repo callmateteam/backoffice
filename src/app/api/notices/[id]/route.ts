@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
-import { deleteNotice } from "@/lib/google-sheets";
+import { deleteNotice } from "@/lib/notion-db";
 
 export async function DELETE(
   _request: NextRequest,
@@ -13,7 +13,7 @@ export async function DELETE(
 
   try {
     const { id } = await params;
-    await deleteNotice(session.accessToken, id);
+    await deleteNotice(id);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Failed to delete notice:", error);

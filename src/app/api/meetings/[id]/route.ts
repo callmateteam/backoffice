@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
-import { getMeetings, updateMeeting, deleteMeeting } from "@/lib/google-sheets";
+import { getMeetings, updateMeeting, deleteMeeting } from "@/lib/notion-db";
 import { notifyMeetingMinutes } from "@/lib/discord";
 
 export async function PUT(
@@ -15,7 +15,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const meetings = await getMeetings(session.accessToken);
+    const meetings = await getMeetings();
     const existing = meetings.find((m) => m.id === id);
     if (!existing) {
       return NextResponse.json({ error: "Meeting not found" }, { status: 404 });
@@ -34,7 +34,7 @@ export async function PUT(
       minutes: body.minutes ?? existing.minutes,
     };
 
-    await updateMeeting(session.accessToken, updated);
+    await updateMeeting(updated);
 
     // 회의록이 새로 작성된 경우 Discord 알림
     const hasMinutesNow = !!updated.minutes?.replace(/<[^>]*>/g, "").trim();
@@ -61,7 +61,7 @@ export async function DELETE(
 
   try {
     const { id } = await params;
-    await deleteMeeting(session.accessToken, id);
+    await deleteMeeting(id);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Failed to delete meeting:", error);

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
-import { getNotices, appendNotice } from "@/lib/google-sheets";
+import { getNotices, appendNotice } from "@/lib/notion-db";
 import { Notice } from "@/types/notice";
 import { v4 as uuidv4 } from "uuid";
 import { notifyNewNotice } from "@/lib/discord";
@@ -13,7 +13,7 @@ export async function GET() {
   }
 
   try {
-    const notices = await getNotices(session.accessToken);
+    const notices = await getNotices();
     return NextResponse.json(notices);
   } catch (error) {
     console.error("Failed to fetch notices:", error);
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString(),
     };
 
-    await appendNotice(session.accessToken, notice);
+    await appendNotice(notice);
     notifyNewNotice(notice.title, getMemberName(notice.author));
     return NextResponse.json(notice, { status: 201 });
   } catch (error) {

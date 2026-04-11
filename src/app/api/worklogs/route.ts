@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
-import { getWorkLogs, appendWorkLog } from "@/lib/google-sheets";
+import { getWorkLogs, appendWorkLog } from "@/lib/notion-db";
 import { WorkLog } from "@/types/worklog";
 import { v4 as uuidv4 } from "uuid";
 import { notifyWorkLogWritten } from "@/lib/discord";
@@ -12,7 +12,7 @@ export async function GET() {
   }
 
   try {
-    const logs = await getWorkLogs(session.accessToken);
+    const logs = await getWorkLogs();
     return NextResponse.json(logs);
   } catch (error) {
     console.error("Failed to fetch worklogs:", error);
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString(),
     };
 
-    await appendWorkLog(session.accessToken, log);
+    await appendWorkLog(log);
 
     // Discord 알림: 요약 2줄
     const lines = log.content.split("\n").filter((l) => l.trim()).slice(0, 2).join(". ");

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
-import { getTodos, updateTodo, deleteTodo } from "@/lib/google-sheets";
+import { getTodos, updateTodo, deleteTodo } from "@/lib/notion-db";
 
 export async function PUT(
   request: NextRequest,
@@ -14,14 +14,14 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const todos = await getTodos(session.accessToken);
+    const todos = await getTodos();
     const existing = todos.find((t) => t.id === id);
     if (!existing) {
       return NextResponse.json({ error: "Todo not found" }, { status: 404 });
     }
 
     const updated = { ...existing, ...body, id };
-    await updateTodo(session.accessToken, updated);
+    await updateTodo(updated);
     return NextResponse.json(updated);
   } catch (error) {
     console.error("Failed to update todo:", error);
@@ -43,7 +43,7 @@ export async function DELETE(
 
   try {
     const { id } = await params;
-    await deleteTodo(session.accessToken, id);
+    await deleteTodo(id);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Failed to delete todo:", error);

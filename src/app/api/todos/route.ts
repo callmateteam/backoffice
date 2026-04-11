@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
-import { getTodos, appendTodo } from "@/lib/google-sheets";
+import { getTodos, appendTodo } from "@/lib/notion-db";
 import { Todo } from "@/types";
 import { v4 as uuidv4 } from "uuid";
 
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   try {
     const scheduleId =
       request.nextUrl.searchParams.get("scheduleId") || undefined;
-    const todos = await getTodos(session.accessToken, scheduleId);
+    const todos = await getTodos(scheduleId);
     return NextResponse.json(todos);
   } catch (error) {
     console.error("Failed to fetch todos:", error);
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString(),
     };
 
-    await appendTodo(session.accessToken, todo);
+    await appendTodo(todo);
     return NextResponse.json(todo, { status: 201 });
   } catch (error) {
     console.error("Failed to create todo:", error);

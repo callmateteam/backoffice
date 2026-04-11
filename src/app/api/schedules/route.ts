@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
-import { getSchedules, appendSchedule } from "@/lib/google-sheets";
+import { getSchedules, appendSchedule } from "@/lib/notion-db";
 import { Schedule } from "@/types";
 import { v4 as uuidv4 } from "uuid";
 import { notifyNewSchedule } from "@/lib/discord";
@@ -12,7 +12,7 @@ export async function GET() {
   }
 
   try {
-    const schedules = await getSchedules(session.accessToken);
+    const schedules = await getSchedules();
     return NextResponse.json(schedules);
   } catch (error) {
     console.error("Failed to fetch schedules:", error);
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       updatedAt: now,
     };
 
-    await appendSchedule(session.accessToken, schedule);
+    await appendSchedule(schedule);
     notifyNewSchedule(schedule.title, schedule.assignee, schedule.startDate, schedule.endDate);
     return NextResponse.json(schedule, { status: 201 });
   } catch (error) {

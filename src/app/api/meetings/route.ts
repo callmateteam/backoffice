@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
-import { getMeetings, appendMeeting } from "@/lib/google-sheets";
+import { getMeetings, appendMeeting } from "@/lib/notion-db";
 import { Meeting } from "@/types/meeting";
 import { v4 as uuidv4 } from "uuid";
 import { notifyNewMeeting } from "@/lib/discord";
@@ -12,7 +12,7 @@ export async function GET() {
   }
 
   try {
-    const meetings = await getMeetings(session.accessToken);
+    const meetings = await getMeetings();
     return NextResponse.json(meetings);
   } catch (error) {
     console.error("Failed to fetch meetings:", error);
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString(),
     };
 
-    await appendMeeting(session.accessToken, meeting);
+    await appendMeeting(meeting);
     notifyNewMeeting(meeting.title, meeting.date, meeting.startTime, meeting.endTime, meeting.participants);
     return NextResponse.json(meeting, { status: 201 });
   } catch (error) {

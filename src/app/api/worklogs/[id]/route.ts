@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
-import { getWorkLogs, updateWorkLog } from "@/lib/google-sheets";
+import { getWorkLogs, updateWorkLog } from "@/lib/notion-db";
 
 export async function PUT(
   request: NextRequest,
@@ -14,7 +14,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const logs = await getWorkLogs(session.accessToken);
+    const logs = await getWorkLogs();
     const existing = logs.find((l) => l.id === id);
     if (!existing) {
       return NextResponse.json({ error: "WorkLog not found" }, { status: 404 });
@@ -26,7 +26,7 @@ export async function PUT(
       date: body.date ?? existing.date,
     };
 
-    await updateWorkLog(session.accessToken, updated);
+    await updateWorkLog(updated);
     return NextResponse.json(updated);
   } catch (error) {
     console.error("Failed to update worklog:", error);

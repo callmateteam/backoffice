@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { useNotices, useCreateNotice, useDeleteNotice } from "@/hooks/use-notices";
 import { getMemberName } from "@/lib/members";
+import { renderContent } from "@/lib/markdown";
 import { Plus, Trash2, Megaphone } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -40,7 +41,7 @@ function decodeHtml(html: string): string {
     .replace(/&nbsp;/g, " ");
 }
 
-function NoticesContent({ userEmail }: { userEmail: string }) {
+export function NoticesContent({ userEmail, embedded }: { userEmail: string; embedded?: boolean }) {
   const { data: notices = [], isLoading } = useNotices();
   const createNotice = useCreateNotice();
   const deleteNotice = useDeleteNotice();
@@ -85,10 +86,9 @@ function NoticesContent({ userEmail }: { userEmail: string }) {
     }
   };
 
-  return (
+  const pageContent = (
     <>
-      <Navbar />
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
+      {!embedded && (
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">공지사항</h1>
@@ -102,6 +102,18 @@ function NoticesContent({ userEmail }: { userEmail: string }) {
             작성
           </Button>
         </div>
+      )}
+      {embedded && (
+        <div className="mb-4 flex justify-end">
+          <Button
+            className="rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-violet-700"
+            onClick={() => setFormOpen(true)}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            작성
+          </Button>
+        </div>
+      )}
 
         {isLoading ? (
           <div className="flex h-96 items-center justify-center text-gray-400">로딩 중...</div>
@@ -138,8 +150,6 @@ function NoticesContent({ userEmail }: { userEmail: string }) {
             ))}
           </div>
         )}
-      </main>
-
       {/* 작성 모달 */}
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
         <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto">
@@ -164,6 +174,7 @@ function NoticesContent({ userEmail }: { userEmail: string }) {
                 onChange={setContent}
                 placeholder="공지 내용을 입력하세요"
               />
+              <p className="text-xs text-gray-400">2000자 제한 | Markdown, HTML 문법 지원</p>
             </div>
             <div className="flex justify-end gap-2 pt-2">
               <Button type="button" variant="outline" onClick={() => setFormOpen(false)}>
@@ -205,14 +216,25 @@ function NoticesContent({ userEmail }: { userEmail: string }) {
                   <span>{formatDate(selectedNotice.createdAt)}</span>
                 </div>
                 <div
-                  className="notice-content text-sm leading-relaxed text-gray-700"
-                  dangerouslySetInnerHTML={{ __html: decodeHtml(selectedNotice.content) }}
+                  className="notice-content prose prose-sm max-w-none text-sm leading-relaxed text-gray-700"
+                  dangerouslySetInnerHTML={{ __html: renderContent(selectedNotice.content) }}
                 />
               </div>
             </>
           )}
         </DialogContent>
       </Dialog>
+    </>
+  );
+
+  if (embedded) return pageContent;
+
+  return (
+    <>
+      <Navbar />
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
+        {pageContent}
+      </main>
     </>
   );
 }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
-import { getMeetings } from "@/lib/google-sheets";
+import { getMeetings } from "@/lib/notion-db";
 import { notifyMeetingReminder } from "@/lib/discord";
 
 export async function POST() {
@@ -10,7 +10,7 @@ export async function POST() {
   }
 
   try {
-    const meetings = await getMeetings(session.accessToken);
+    const meetings = await getMeetings();
     const now = new Date();
     let sent = 0;
 

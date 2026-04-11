@@ -6,7 +6,7 @@ import {
   deleteSchedule,
   deleteTodo,
   getTodos,
-} from "@/lib/google-sheets";
+} from "@/lib/notion-db";
 
 export async function PUT(
   request: NextRequest,
@@ -20,7 +20,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const schedules = await getSchedules(session.accessToken);
+    const schedules = await getSchedules();
     const existing = schedules.find((s) => s.id === id);
     if (!existing) {
       return NextResponse.json(
@@ -36,7 +36,7 @@ export async function PUT(
       updatedAt: new Date().toISOString(),
     };
 
-    await updateSchedule(session.accessToken, updated);
+    await updateSchedule(updated);
     return NextResponse.json(updated);
   } catch (error) {
     console.error("Failed to update schedule:", error);
@@ -58,12 +58,11 @@ export async function DELETE(
 
   try {
     const { id } = await params;
-    // Delete associated todos first
-    const todos = await getTodos(session.accessToken, id);
+    const todos = await getTodos(id);
     for (const todo of todos) {
-      await deleteTodo(session.accessToken, todo.id);
+      await deleteTodo(todo.id);
     }
-    await deleteSchedule(session.accessToken, id);
+    await deleteSchedule(id);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Failed to delete schedule:", error);

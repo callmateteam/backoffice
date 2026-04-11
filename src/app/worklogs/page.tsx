@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { useWorkLogs, useCreateWorkLog, useUpdateWorkLog } from "@/hooks/use-worklogs";
 import { getMemberName } from "@/lib/members";
-import { renderMarkdown } from "@/lib/markdown";
+import { renderContent } from "@/lib/markdown";
 import { WorkLog } from "@/types/worklog";
 import { Plus, Pencil, ChevronLeft, ChevronRight } from "lucide-react";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, addDays, addWeeks, addMonths, subDays, subWeeks, subMonths, isWithinInterval, parseISO } from "date-fns";
@@ -40,7 +40,7 @@ export default function WorkLogsPage() {
   return <WorkLogsContent userEmail={session.user?.email || ""} />;
 }
 
-function WorkLogsContent({ userEmail }: { userEmail: string }) {
+export function WorkLogsContent({ userEmail, embedded }: { userEmail: string; embedded?: boolean }) {
   const { data: logs = [], isLoading } = useWorkLogs();
   const createWorkLog = useCreateWorkLog();
   const updateWorkLog = useUpdateWorkLog();
@@ -167,10 +167,9 @@ function WorkLogsContent({ userEmail }: { userEmail: string }) {
 
   const colorClass = (email: string) => MEMBER_COLORS[email] || "from-gray-400 to-gray-500";
 
-  return (
+  const pageContent = (
     <>
-      <Navbar />
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
+      {!embedded && (
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">업무일지</h1>
@@ -183,86 +182,96 @@ function WorkLogsContent({ userEmail }: { userEmail: string }) {
             <Plus className="mr-2 h-4 w-4" /> 오늘 일지 작성
           </Button>
         </div>
+      )}
+      {embedded && (
+        <div className="mb-4 flex justify-end">
+          <Button
+            className="rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-violet-700"
+            onClick={() => setFormOpen(true)}
+          >
+            <Plus className="mr-2 h-4 w-4" /> 오늘 일지 작성
+          </Button>
+        </div>
+      )}
 
-        {/* 필터 */}
-        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap items-center gap-3">
-            {/* 멤버 필터 */}
-            <div className="flex rounded-xl border border-gray-200 bg-white p-0.5">
-              <button onClick={() => setAssigneeFilter("all")}
-                className={cn("rounded-lg px-3 py-1.5 text-xs font-medium transition-all", assigneeFilter === "all" ? "bg-indigo-600 text-white" : "text-gray-500")}>
-                전체
+      {/* 필터 */}
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* 멤버 필터 */}
+          <div className="flex rounded-xl border border-gray-200 bg-white p-0.5">
+            <button onClick={() => setAssigneeFilter("all")}
+              className={cn("rounded-lg px-3 py-1.5 text-xs font-medium transition-all", assigneeFilter === "all" ? "bg-indigo-600 text-white" : "text-gray-500")}>
+              전체
+            </button>
+            {assignees.map((a) => (
+              <button key={a} onClick={() => setAssigneeFilter(a)}
+                className={cn("rounded-lg px-3 py-1.5 text-xs font-medium transition-all", assigneeFilter === a ? "bg-indigo-600 text-white" : "text-gray-500")}>
+                {getMemberName(a)}
               </button>
-              {assignees.map((a) => (
-                <button key={a} onClick={() => setAssigneeFilter(a)}
-                  className={cn("rounded-lg px-3 py-1.5 text-xs font-medium transition-all", assigneeFilter === a ? "bg-indigo-600 text-white" : "text-gray-500")}>
-                  {getMemberName(a)}
-                </button>
-              ))}
-            </div>
-
-            {/* 기간 뷰 */}
-            <div className="flex rounded-xl border border-gray-200 bg-white p-0.5">
-              {(["day", "week", "month"] as ViewMode[]).map((v) => (
-                <button key={v} onClick={() => setViewMode(v)}
-                  className={cn("rounded-lg px-3 py-1.5 text-xs font-medium transition-all", viewMode === v ? "bg-indigo-600 text-white" : "text-gray-500")}>
-                  {v === "day" ? "일별" : v === "week" ? "주별" : "월별"}
-                </button>
-              ))}
-            </div>
+            ))}
           </div>
 
-          {/* 날짜 네비 */}
-          <div className="flex items-center gap-2">
-            <button onClick={() => navigate(-1)} className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50">
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <span className="min-w-[140px] text-center text-sm font-semibold">{dateLabel()}</span>
-            <button onClick={() => navigate(1)} className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50">
-              <ChevronRight className="h-4 w-4" />
-            </button>
-            <button onClick={() => setCurrentDate(new Date())} className="ml-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-50">
-              오늘
-            </button>
+          {/* 기간 뷰 */}
+          <div className="flex rounded-xl border border-gray-200 bg-white p-0.5">
+            {(["day", "week", "month"] as ViewMode[]).map((v) => (
+              <button key={v} onClick={() => setViewMode(v)}
+                className={cn("rounded-lg px-3 py-1.5 text-xs font-medium transition-all", viewMode === v ? "bg-indigo-600 text-white" : "text-gray-500")}>
+                {v === "day" ? "일별" : v === "week" ? "주별" : "월별"}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* 일지 목록 */}
-        {isLoading ? (
-          <div className="flex h-96 items-center justify-center text-gray-400">로딩 중...</div>
-        ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-100 bg-white py-20 shadow-sm">
-            <p className="text-sm text-gray-400">해당 기간에 작성된 업무일지가 없습니다</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {filtered.map((log) => (
-              <div key={log.id}
-                className="cursor-pointer rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
-                onClick={() => { setDetailLog(log); setIsEditing(false); setEditContent(log.content); }}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-linear-to-br text-sm font-bold text-white", colorClass(log.author))}>
-                      {getMemberName(log.author)[0]}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <span className="font-semibold text-gray-900">{getMemberName(log.author)}</span>
-                      <p className="mt-1 text-sm text-gray-500 line-clamp-2">{getPreview(log.content)}</p>
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        {getSectionTags(log.content).map((tag) => (
-                          <span key={tag} className="rounded-md bg-gray-50 px-2 py-0.5 text-[11px] text-gray-400">{tag}</span>
-                        ))}
-                      </div>
+        {/* 날짜 네비 */}
+        <div className="flex items-center gap-2">
+          <button onClick={() => navigate(-1)} className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50">
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <span className="min-w-[140px] text-center text-sm font-semibold">{dateLabel()}</span>
+          <button onClick={() => navigate(1)} className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50">
+            <ChevronRight className="h-4 w-4" />
+          </button>
+          <button onClick={() => setCurrentDate(new Date())} className="ml-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-50">
+            오늘
+          </button>
+        </div>
+      </div>
+
+      {/* 일지 목록 */}
+      {isLoading ? (
+        <div className="flex h-96 items-center justify-center text-gray-400">로딩 중...</div>
+      ) : filtered.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-100 bg-white py-20 shadow-sm">
+          <p className="text-sm text-gray-400">해당 기간에 작성된 업무일지가 없습니다</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map((log) => (
+            <div key={log.id}
+              className="cursor-pointer rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+              onClick={() => { setDetailLog(log); setIsEditing(false); setEditContent(log.content); }}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-linear-to-br text-sm font-bold text-white", colorClass(log.author))}>
+                    {getMemberName(log.author)[0]}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="font-semibold text-gray-900">{getMemberName(log.author)}</span>
+                    <p className="mt-1 text-sm text-gray-500 line-clamp-2">{getPreview(log.content)}</p>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {getSectionTags(log.content).map((tag) => (
+                        <span key={tag} className="rounded-md bg-gray-50 px-2 py-0.5 text-[11px] text-gray-400">{tag}</span>
+                      ))}
                     </div>
                   </div>
-                  <span className="shrink-0 rounded-xl bg-indigo-50 px-3 py-1.5 text-xs font-bold text-indigo-600">{log.date}</span>
                 </div>
+                <span className="shrink-0 rounded-xl bg-indigo-50 px-3 py-1.5 text-xs font-bold text-indigo-600">{log.date}</span>
               </div>
-            ))}
-          </div>
-        )}
-      </main>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* 작성 모달 */}
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
@@ -362,13 +371,24 @@ function WorkLogsContent({ userEmail }: { userEmail: string }) {
               ) : (
                 <div
                   className="notice-content md-content text-sm leading-relaxed text-gray-700"
-                  dangerouslySetInnerHTML={{ __html: renderMarkdown(detailLog.content) }}
+                  dangerouslySetInnerHTML={{ __html: renderContent(detailLog.content) }}
                 />
               )}
             </>
           )}
         </DialogContent>
       </Dialog>
+    </>
+  );
+
+  if (embedded) return pageContent;
+
+  return (
+    <>
+      <Navbar />
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
+        {pageContent}
+      </main>
     </>
   );
 }
