@@ -3,20 +3,27 @@ import { Notice } from "@/types/notice";
 import { Meeting } from "@/types/meeting";
 import { WorkLog } from "@/types/worklog";
 
-const NOTION_TOKEN = process.env.NOTION_TOKEN!;
-const SCHEDULES_DB = process.env.NOTION_SCHEDULES_DB!;
-const TODOS_DB = process.env.NOTION_TODOS_DB!;
-const NOTICES_DB = process.env.NOTION_NOTICES_DB!;
-const MEETINGS_DB = process.env.NOTION_MEETINGS_DB!;
-const WORKLOGS_DB = process.env.NOTION_WORKLOGS_DB!;
-
 const NOTION_API = "https://api.notion.com/v1";
 
-const headers = {
-  Authorization: `Bearer ${NOTION_TOKEN}`,
-  "Content-Type": "application/json",
-  "Notion-Version": "2022-06-28",
-};
+function getToken() { return process.env.NOTION_TOKEN!; }
+function getDbId(name: string) {
+  const map: Record<string, string> = {
+    schedules: process.env.NOTION_SCHEDULES_DB!,
+    todos: process.env.NOTION_TODOS_DB!,
+    notices: process.env.NOTION_NOTICES_DB!,
+    meetings: process.env.NOTION_MEETINGS_DB!,
+    worklogs: process.env.NOTION_WORKLOGS_DB!,
+  };
+  return map[name];
+}
+
+function getHeaders() {
+  return {
+    Authorization: `Bearer ${getToken()}`,
+    "Content-Type": "application/json",
+    "Notion-Version": "2022-06-28",
+  };
+}
 
 // --- Helpers ---
 
@@ -27,7 +34,7 @@ async function queryDb(dbId: string, filter?: any, sorts?: any[]): Promise<any[]
 
   const res = await fetch(`${NOTION_API}/databases/${dbId}/query`, {
     method: "POST",
-    headers,
+    headers: getHeaders(),
     body: JSON.stringify(body),
   });
 
@@ -39,9 +46,9 @@ async function queryDb(dbId: string, filter?: any, sorts?: any[]): Promise<any[]
 async function createPage(dbId: string, properties: any): Promise<string> {
   const res = await fetch(`${NOTION_API}/pages`, {
     method: "POST",
-    headers,
+    headers: getHeaders(),
     body: JSON.stringify({
-      parent: { database_id: dbId },
+      parent: { database_id: dbId as string },
       properties,
     }),
   });
@@ -54,7 +61,7 @@ async function createPage(dbId: string, properties: any): Promise<string> {
 async function updatePage(pageId: string, properties: any): Promise<void> {
   const res = await fetch(`${NOTION_API}/pages/${pageId}`, {
     method: "PATCH",
-    headers,
+    headers: getHeaders(),
     body: JSON.stringify({ properties }),
   });
 
@@ -64,7 +71,7 @@ async function updatePage(pageId: string, properties: any): Promise<void> {
 async function archivePage(pageId: string): Promise<void> {
   const res = await fetch(`${NOTION_API}/pages/${pageId}`, {
     method: "PATCH",
-    headers,
+    headers: getHeaders(),
     body: JSON.stringify({ archived: true }),
   });
 
@@ -148,12 +155,12 @@ function parseSchedule(page: any): Schedule {
 }
 
 export async function getSchedules(): Promise<Schedule[]> {
-  const pages = await queryDb(SCHEDULES_DB);
+  const pages = await queryDb(getDbId("schedules"));
   return pages.map(parseSchedule);
 }
 
 export async function appendSchedule(schedule: Schedule): Promise<void> {
-  await createPage(SCHEDULES_DB, {
+  await createPage(getDbId("schedules"), {
     제목: titleProp(schedule.title),
     description: richText(schedule.description),
     startDate: dateProp(schedule.startDate),
@@ -206,12 +213,12 @@ export async function getTodos(scheduleId?: string): Promise<Todo[]> {
     };
   }
 
-  const pages = await queryDb(TODOS_DB, filter);
+  const pages = await queryDb(getDbId("todos"), filter);
   return pages.map(parseTodo);
 }
 
 export async function appendTodo(todo: Todo): Promise<void> {
-  await createPage(TODOS_DB, {
+  await createPage(getDbId("todos"), {
     제목: titleProp(todo.title),
     scheduleId: richText(todo.scheduleId),
     completed: checkboxProp(todo.completed),
@@ -251,14 +258,14 @@ function parseNotice(page: any): Notice {
 }
 
 export async function getNotices(): Promise<Notice[]> {
-  const pages = await queryDb(NOTICES_DB, undefined, [
+  const pages = await queryDb(getDbId("notices"), undefined, [
     { timestamp: "created_time", direction: "descending" },
   ]);
   return pages.map(parseNotice);
 }
 
 export async function appendNotice(notice: Notice): Promise<void> {
-  await createPage(NOTICES_DB, {
+  await createPage(getDbId("notices"), {
     제목: titleProp(notice.title),
     content: richText(notice.content),
     author: richText(notice.author),
@@ -288,14 +295,14 @@ function parseMeeting(page: any): Meeting {
 }
 
 export async function getMeetings(): Promise<Meeting[]> {
-  const pages = await queryDb(MEETINGS_DB, undefined, [
+  const pages = await queryDb(getDbId("meetings"), undefined, [
     { timestamp: "created_time", direction: "descending" },
   ]);
   return pages.map(parseMeeting);
 }
 
 export async function appendMeeting(meeting: Meeting): Promise<void> {
-  await createPage(MEETINGS_DB, {
+  await createPage(getDbId("meetings"), {
     제목: titleProp(meeting.title),
     date: dateProp(meeting.date),
     startTime: richText(meeting.startTime),
@@ -337,14 +344,14 @@ function parseWorkLog(page: any): WorkLog {
 }
 
 export async function getWorkLogs(): Promise<WorkLog[]> {
-  const pages = await queryDb(WORKLOGS_DB, undefined, [
+  const pages = await queryDb(getDbId("worklogs"), undefined, [
     { timestamp: "created_time", direction: "descending" },
   ]);
   return pages.map(parseWorkLog);
 }
 
 export async function appendWorkLog(log: WorkLog): Promise<void> {
-  await createPage(WORKLOGS_DB, {
+  await createPage(getDbId("worklogs"), {
     제목: titleProp(`${log.date} - ${log.author}`),
     date: dateProp(log.date),
     author: richText(log.author),
