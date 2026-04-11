@@ -168,7 +168,6 @@ export async function appendSchedule(schedule: Schedule): Promise<void> {
     status: selectProp(schedule.status),
     assignee: richText(schedule.assignee),
     color: richText(schedule.color),
-    legacyId: richText(schedule.id),
   });
 }
 
@@ -225,7 +224,6 @@ export async function appendTodo(todo: Todo): Promise<void> {
     order: numberProp(todo.order),
     assignee: richText(todo.assignee),
     link: urlProp(todo.link),
-    legacyId: richText(todo.id),
   });
 }
 
@@ -269,7 +267,6 @@ export async function appendNotice(notice: Notice): Promise<void> {
     제목: titleProp(notice.title),
     content: richText(notice.content),
     author: richText(notice.author),
-    legacyId: richText(notice.id),
   });
 }
 
@@ -310,7 +307,6 @@ export async function appendMeeting(meeting: Meeting): Promise<void> {
     participants: richText(meeting.participants),
     agenda: richText(meeting.agenda),
     minutes: richText(meeting.minutes),
-    legacyId: richText(meeting.id),
   });
 }
 
@@ -356,7 +352,6 @@ export async function appendWorkLog(log: WorkLog): Promise<void> {
     date: dateProp(log.date),
     author: richText(log.author),
     content: richText(log.content),
-    legacyId: richText(log.id),
   });
 }
 
