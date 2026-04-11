@@ -150,6 +150,28 @@ export async function generateDrafts(): Promise<{ count: number }> {
 
     recentContents.unshift(content);
     count++;
+
+    // Discord 알림
+    if (DISCORD_THREADS_WEBHOOK) {
+      await fetch(DISCORD_THREADS_WEBHOOK, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          embeds: [{
+            title: "Threads 초안 생성됨",
+            color: 0x7c3aed,
+            fields: [
+              { name: "유형", value: type, inline: true },
+              { name: "주제", value: topic, inline: true },
+              { name: "글자수", value: `${content.length}자`, inline: true },
+              { name: "본문", value: content.length > 300 ? content.slice(0, 300) + "..." : content },
+            ],
+            footer: { text: "백오피스에서 확인 후 승인해주세요" },
+            timestamp: new Date().toISOString(),
+          }],
+        }),
+      }).catch(() => {});
+    }
   }
 
   return { count };
