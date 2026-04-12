@@ -36,6 +36,12 @@ export async function GET() {
       scheduledAt: p["예약시간"]?.date?.start ?? null,
       threadsUrl: p["Threads URL"]?.url ?? null,
       createdAt: page.created_time,
+      views: p["views"]?.number ?? 0,
+      likes: p["likes"]?.number ?? 0,
+      replyCount: p["replyCount"]?.number ?? 0,
+      reposts: p["reposts"]?.number ?? 0,
+      quotes: p["quotes"]?.number ?? 0,
+      shares: p["shares"]?.number ?? 0,
     };
   });
 

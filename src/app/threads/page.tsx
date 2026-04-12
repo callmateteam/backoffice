@@ -33,6 +33,11 @@ import {
   User,
   Sparkles,
   Pencil,
+  Eye as EyeIcon,
+  Heart,
+  Repeat2,
+  Quote,
+  Share2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -244,6 +249,30 @@ function ThreadsContent() {
                       <p className="line-clamp-3 text-sm leading-relaxed text-gray-700 whitespace-pre-line">
                         {post.content}
                       </p>
+                      {post.status === "발행완료" && (
+                        <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
+                          <span className="flex items-center gap-1">
+                            <EyeIcon className="h-3 w-3" />
+                            {post.views.toLocaleString()}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Heart className="h-3 w-3" />
+                            {post.likes.toLocaleString()}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <MessageCircle className="h-3 w-3" />
+                            {post.replyCount.toLocaleString()}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Repeat2 className="h-3 w-3" />
+                            {post.reposts.toLocaleString()}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Share2 className="h-3 w-3" />
+                            {post.shares.toLocaleString()}
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div className="shrink-0 text-right">
                       <p className="text-xs text-gray-400">
@@ -364,6 +393,59 @@ function ThreadsContent() {
                     <ExternalLink className="h-3 w-3" />
                     Threads에서 보기
                   </a>
+                )}
+
+                {selectedPost.status === "발행완료" && (
+                  <div className="grid grid-cols-3 gap-2 rounded-lg bg-gray-50 p-3">
+                    <div className="flex flex-col items-center gap-0.5">
+                      <div className="flex items-center gap-1 text-xs text-gray-500">
+                        <EyeIcon className="h-3 w-3" /> 조회
+                      </div>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {selectedPost.views.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-center gap-0.5">
+                      <div className="flex items-center gap-1 text-xs text-gray-500">
+                        <Heart className="h-3 w-3" /> 좋아요
+                      </div>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {selectedPost.likes.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-center gap-0.5">
+                      <div className="flex items-center gap-1 text-xs text-gray-500">
+                        <MessageCircle className="h-3 w-3" /> 댓글
+                      </div>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {selectedPost.replyCount.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-center gap-0.5">
+                      <div className="flex items-center gap-1 text-xs text-gray-500">
+                        <Repeat2 className="h-3 w-3" /> 리포스트
+                      </div>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {selectedPost.reposts.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-center gap-0.5">
+                      <div className="flex items-center gap-1 text-xs text-gray-500">
+                        <Quote className="h-3 w-3" /> 인용
+                      </div>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {selectedPost.quotes.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-center gap-0.5">
+                      <div className="flex items-center gap-1 text-xs text-gray-500">
+                        <Share2 className="h-3 w-3" /> 공유
+                      </div>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {selectedPost.shares.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
                 )}
 
                 {selectedPost.scheduledAt && (

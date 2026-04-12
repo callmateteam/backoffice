@@ -11,6 +11,12 @@ export interface ThreadPost {
   scheduledAt: string | null;
   threadsUrl: string | null;
   createdAt: string;
+  views: number;
+  likes: number;
+  replyCount: number;
+  reposts: number;
+  quotes: number;
+  shares: number;
 }
 
 export interface ThreadReply {

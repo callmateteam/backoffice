@@ -10,6 +10,8 @@ on:
     - cron: '0 * * * *'
     # 매일 23:00 KST (14:00 UTC) — 업무일지 리마인더
     - cron: '0 14 * * *'
+    # 매시간 15분 — Threads 성과 지표 수집
+    - cron: '15 * * * *'
   workflow_dispatch: # 수동 실행 가능
 
 jobs:
@@ -51,3 +53,13 @@ jobs:
         run: |
           curl -s -X GET "${{ secrets.DEPLOY_URL }}/api/cron/worklog-reminder" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+
+  threads-insights:
+    if: github.event.schedule == '15 * * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Threads Insights
+        run: |
+          curl -s -X POST "${{ secrets.DEPLOY_URL }}/api/cron/threads-insights" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"
