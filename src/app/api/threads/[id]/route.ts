@@ -43,10 +43,11 @@ export async function DELETE(
 
   const { id } = await params;
 
+  // Notion은 진짜 삭제(destroy) API가 없음 — archive가 DB에서 완전히 빠지게 만듦
   const res = await fetch(`${NOTION_API}/pages/${id}`, {
     method: "PATCH",
     headers,
-    body: JSON.stringify({ archived: true }),
+    body: JSON.stringify({ in_trash: true, archived: true }),
   });
 
   if (!res.ok) return NextResponse.json({ error: "Failed" }, { status: 500 });

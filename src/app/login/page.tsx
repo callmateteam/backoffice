@@ -14,9 +14,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm px-4">
         <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-xl shadow-indigo-100/50">
           <div className="flex flex-col items-center text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-600 to-violet-600 shadow-lg shadow-indigo-200">
-              <CalendarDays className="h-7 w-7 text-white" />
-            </div>
+            <img src="/logo.png" alt="백오피스" className="h-14 w-14 rounded-2xl object-contain shadow-lg shadow-indigo-200" />
             <h1 className="mt-5 text-2xl font-bold text-gray-900">백오피스</h1>
             <p className="mt-2 text-sm text-gray-500">
               일정관리 시스템에 로그인하세요

@@ -31,9 +31,7 @@ export function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-indigo-600 to-violet-600 shadow-md shadow-indigo-200">
-              <CalendarDays className="h-4 w-4 text-white" />
-            </div>
+            <img src="/logo.png" alt="백오피스" className="h-8 w-8 rounded-lg object-contain" />
             <span className="text-lg font-bold tracking-tight text-gray-900">백오피스</span>
           </Link>
 

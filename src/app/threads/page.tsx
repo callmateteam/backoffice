@@ -88,6 +88,11 @@ function ThreadsContent() {
   const [filter, setFilter] = useState<string>("all");
   const [editingDraftId, setEditingDraftId] = useState<string | null>(null);
   const [editingDraftText, setEditingDraftText] = useState("");
+  const [writeOpen, setWriteOpen] = useState(false);
+  const [newContent, setNewContent] = useState("");
+  const [newType, setNewType] = useState("공감형");
+  const [publishAfterCreate, setPublishAfterCreate] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const filteredPosts = filter === "all" ? posts : posts.filter((p) => p.status === filter);
 
@@ -110,9 +115,10 @@ function ThreadsContent() {
   };
 
   const handleDiscard = async (id: string) => {
+    if (!confirm("이 초안을 거절하고 DB에서 삭제하시겠습니까?")) return;
     try {
-      await updatePost.mutateAsync({ id, status: "폐기" });
-      toast.success("폐기되었습니다.");
+      await deletePost.mutateAsync(id);
+      toast.success("거절되어 삭제되었습니다.");
       setSelectedPost(null);
     } catch {
       toast.error("실패");
@@ -140,6 +146,57 @@ function ThreadsContent() {
     }
   };
 
+  const handleCreateManual = async () => {
+    if (!newContent.trim()) {
+      toast.error("내용을 입력해주세요.");
+      return;
+    }
+    if (newContent.length > 500) {
+      toast.error("500자 이하로 작성해주세요.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const preview = newContent.slice(0, 15).replace(/\n/g, " ");
+      const createRes = await fetch("/api/threads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: `[${newType}] ${preview}...`,
+          content: newContent,
+          type: newType,
+        }),
+      });
+      if (!createRes.ok) throw new Error("생성 실패");
+      const { id } = await createRes.json();
+
+      if (publishAfterCreate) {
+        // 바로 발행
+        const pubRes = await fetch("/api/threads/publish-now", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        });
+        if (!pubRes.ok) throw new Error("발행 실패");
+        toast.success("작성 후 바로 발행 완료!");
+      } else {
+        toast.success("초안으로 저장되었습니다.");
+      }
+
+      setNewContent("");
+      setNewType("공감형");
+      setPublishAfterCreate(false);
+      setWriteOpen(false);
+      // 목록 새로고침 — React Query invalidate
+      window.location.reload();
+    } catch (e) {
+      console.error(e);
+      toast.error("실패했습니다.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const openDetail = (post: ThreadPost) => {
     setSelectedPost(post);
     setEditContent(post.content);
@@ -164,12 +221,21 @@ function ThreadsContent() {
               AI가 생성한 초안을 확인하고 승인하세요
             </p>
           </div>
-          <Link href="/threads/replies">
-            <Button variant="outline" className="rounded-xl">
-              <MessageCircle className="mr-2 h-4 w-4" />
-              댓글 보기
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setWriteOpen(true)}
+              className="rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-violet-700"
+            >
+              <Pencil className="mr-2 h-4 w-4" />
+              직접 작성
             </Button>
-          </Link>
+            <Link href="/threads/replies">
+              <Button variant="outline" className="rounded-xl">
+                <MessageCircle className="mr-2 h-4 w-4" />
+                댓글 보기
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Status Filter */}
@@ -712,6 +778,62 @@ function ThreadsContent() {
               </div>
             </>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* 직접 작성 모달 */}
+      <Dialog open={writeOpen} onOpenChange={setWriteOpen}>
+        <DialogContent className="sm:max-w-xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>직접 작성</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">유형</label>
+              <select
+                value={newType}
+                onChange={(e) => setNewType(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-400"
+              >
+                {Object.keys(TYPE_COLORS).map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                본문 <span className={cn("text-xs", newContent.length > 500 ? "text-red-500" : "text-gray-400")}>({newContent.length}/500)</span>
+              </label>
+              <textarea
+                value={newContent}
+                onChange={(e) => setNewContent(e.target.value)}
+                placeholder="오늘 만난 사장님이..."
+                rows={10}
+                className="mt-1 w-full rounded-lg border border-gray-200 p-3 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+              />
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={publishAfterCreate}
+                onChange={(e) => setPublishAfterCreate(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300"
+              />
+              <span className="text-sm text-gray-700">작성 후 바로 Threads에 발행</span>
+            </label>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button type="button" variant="outline" onClick={() => setWriteOpen(false)}>
+                취소
+              </Button>
+              <Button
+                onClick={handleCreateManual}
+                disabled={submitting || !newContent.trim()}
+                className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700"
+              >
+                {submitting ? "처리 중..." : publishAfterCreate ? "작성 + 바로 발행" : "초안으로 저장"}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </>

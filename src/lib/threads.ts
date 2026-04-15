@@ -1,19 +1,23 @@
 const BASE_URL = "https://graph.threads.net/v1.0";
-
-const THREADS_USER_ID = process.env.THREADS_USER_ID!;
-const THREADS_ACCESS_TOKEN = process.env.THREADS_ACCESS_TOKEN!;
-const NOTION_TOKEN = process.env.NOTION_TOKEN!;
-const THREADS_DB = process.env.NOTION_THREADS_DB!;
-const REPLIES_DB = process.env.NOTION_REPLIES_DB!;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY!;
-const DISCORD_THREADS_WEBHOOK = process.env.DISCORD_THREADS_WEBHOOK_URL || "";
-
 const NOTION_API = "https://api.notion.com/v1";
-const notionHeaders = {
-  Authorization: `Bearer ${NOTION_TOKEN}`,
-  "Content-Type": "application/json",
-  "Notion-Version": "2022-06-28",
+
+const env = {
+  get userId() { return process.env.THREADS_USER_ID || ""; },
+  get accessToken() { return process.env.THREADS_ACCESS_TOKEN || ""; },
+  get notionToken() { return process.env.NOTION_TOKEN || ""; },
+  get threadsDb() { return process.env.NOTION_THREADS_DB || ""; },
+  get repliesDb() { return process.env.NOTION_REPLIES_DB || ""; },
+  get geminiKey() { return process.env.GEMINI_API_KEY || ""; },
+  get discordWebhook() { return process.env.DISCORD_THREADS_WEBHOOK_URL || ""; },
 };
+
+function notionHeaders() {
+  return {
+    Authorization: `Bearer ${env.notionToken}`,
+    "Content-Type": "application/json",
+    "Notion-Version": "2022-06-28",
+  };
+}
 
 // --- Post Types & Topics ---
 
@@ -71,40 +75,55 @@ const TEMPLATE_INSTRUCTIONS: Record<string, string> = {
 마지막에 "어느 쪽이 맞는 걸까요."로 끝내세요.`,
 };
 
-const SYSTEM_PROMPT = `당신은 소상공인을 위한 AI 서비스를 만들고 있는 사람입니다. 소상공인 사장님들을 도와드리는 서비스를 개발하다 보니 사장님들을 자주 만나고, 그분들의 이야기를 많이 듣게 됩니다.
+const SYSTEM_PROMPT = `당신은 Threads에 글을 쓰는 사람이에요. 회사 공식 계정이 아니라 그냥 친구한테 말하듯이 쓰세요. 대기업 BBQ, KREAM, 토스 같은 브랜드들이 Threads에서 하는 방식이에요.
 
-당신의 목표는 Threads에서 사장님들이 들려준 이야기를 전하면서, 읽는 사장님들이 "아 맞아, 나도 그래" 하면서 자기 이야기를 답글로 꺼내게 만드는 거예요. 감정을 파는 거예요.
+핵심 원칙: AI가 쓴 티가 나면 안 돼요. 공식 계정 티도 나면 안 돼요. 진짜 사람이 친구한테 말하듯이.
 
 정체성:
-- 소상공인 AI 서비스를 만들고 있는 개발자/창업자
-- 사장님들과 미팅하면서 들은 이야기를 전하는 사람
-- 사장님이 아니라 사장님들의 이야기를 듣고 감동받거나 마음 아팠던 사람
+- 소상공인 AI 만드는 작은 팀에서 일하는 사람
+- 사장님들이랑 자주 만나서 얘기 듣는 사람
+- 광고하러 온 게 아니라 그냥 겪은 거 풀어놓는 사람
 
-글쓰기 규칙:
-- 해요체 사용 (따뜻하고 솔직하게)
-- 반말(X), 합쇼체(X)
+말투 (가장 중요):
+- 짧은 문장. 긴 설명 금지. 한 줄 or 두 줄 기본.
+- 줄바꿈으로 호흡 끊기
+- "~거든요", "~더라구요", "~해요" 정도의 친근한 해요체
+- 가끔 "ㄹㅇ", "진심", "미쳤다" 같은 표현 써도 됨
+- 의도적 오타나 줄임말 허용 ("근데" O, "그런데" X)
+- "저희는~", "브랜드에서는~" 절대 금지
+- 합쇼체 금지. 교과서 톤 금지.
+
+시작 패턴 (AI 티 안 나게):
+- "이거 나만 그런거야?"
+- "근데 진짜 궁금한게"
+- "오늘 만난 사장님이"
+- "아 이거 말해도 되나"
+- "솔직히 말할게요"
+- 절대 금지: "안녕하세요", "여러분", "오늘은 ~에 대해"
+
+내용 원칙:
+- 구체적 숫자·상황·장면 (월매출 800만원, 새벽 5시 같은)
+- 교훈/조언/정리 절대 금지. 느끼게만 두기.
+- 성공 자랑 X, 실패/현실 O
+- 마지막은 열린 질문 or 여운 있는 한 줄
+- "(아마도요.)" 같은 불확실한 마무리 자주 활용
 - 500자 이하 엄수
-- 이모지 최대 1-2개
-- 외부 링크 절대 포함 금지
-- 서비스 홍보/광고 절대 금지 (자연스럽게 "소상공인 AI 만들고 있다"는 맥락만 OK)
-- 마지막은 반드시 열린 구조로 끝내기 (답글 유도)
-- 줄바꿈을 활용해서 가독성 확보
-- "잖아요", "그렇지 않아요?", "하시더라고요" 같은 공감/전달 어미 활용
-- 초구체적이고 현실적인 상황 묘사 (구체적 숫자, 구체적 상황)
-- 해시태그 사용하지 않기
-- 교훈/조언 절대 명시하지 않기 — 독자가 느끼게
-- "~하면 됩니다" 같은 강사 톤 절대 금지
-- 추상적 동기부여 금지 ("포기하지 마세요", "열심히 하면 됩니다" 등)
-- 실패/현실 이야기 > 성공 자랑
+- 해시태그 없음, 이모지 최대 1개, 외부링크 없음
+
+브랜드 티 안 내는 방법 (BBQ "마케팅팀 막내", KREAM 반말 스타일 참고):
+- 1인칭으로 말하기. "우리 회사"가 아니라 "나".
+- 홍보 멘트 절대 금지. "우리 서비스가..." X
+- 밈/트렌드 재해석 OK ("황홀이 아니라 황올" 같은 언어유희)
+- 기업 계정 특유의 단정한 문어체 금지. 카톡 쓰듯이.
 
 톤 예시:
-- "소상공인 사장님들 AI로 도와드리는 서비스 만들고 있는데, 오늘 미팅에서 들은 얘기가 자꾸 생각나요." (O)
-- "오늘 만난 사장님이 그러시더라고요." (O)
-- "소상공인 여러분을 위한 팁을 알려드릴게요" (X)
-- "이런 전략을 활용해보세요" (X)
-- "(아마도요.)" 같은 불확실한 마무리 — 여운 (O)
+✅ "오늘 만난 사장님이 통장 잔고 340만원이라고 하시더라구요\\n\\n근데 웃으시면서 말씀하셔서 더 마음이 그랬어요"
+✅ "이거 나만 그런거야?\\n\\n사장님들이랑 얘기하다 보면 다들 하나같이 그 말 하시거든요"
+❌ "소상공인 사장님 여러분, 오늘은 ~에 대해 이야기해보겠습니다"
+❌ "이런 노하우를 알려드릴게요"
+❌ "저희가 만들고 있는 서비스는..."
 
-글만 출력하세요. 제목, 설명, 따옴표 없이 본문만 작성하세요.`;
+출력은 본문만. 제목/설명/따옴표 없이 본문만 출력하세요.`;
 
 // --- Notion Helpers ---
 
@@ -116,7 +135,7 @@ async function queryNotionDb(dbId: string, filter?: any, sorts?: any[], pageSize
 
   const res = await fetch(`${NOTION_API}/databases/${dbId}/query`, {
     method: "POST",
-    headers: notionHeaders,
+    headers: notionHeaders(),
     body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`Notion query failed: ${await res.text()}`);
@@ -126,7 +145,7 @@ async function queryNotionDb(dbId: string, filter?: any, sorts?: any[], pageSize
 async function createNotionPage(dbId: string, properties: any): Promise<string> {
   const res = await fetch(`${NOTION_API}/pages`, {
     method: "POST",
-    headers: notionHeaders,
+    headers: notionHeaders(),
     body: JSON.stringify({ parent: { database_id: dbId }, properties }),
   });
   if (!res.ok) throw new Error(`Notion create failed: ${await res.text()}`);
@@ -136,7 +155,7 @@ async function createNotionPage(dbId: string, properties: any): Promise<string> 
 async function updateNotionPage(pageId: string, properties: any): Promise<void> {
   const res = await fetch(`${NOTION_API}/pages/${pageId}`, {
     method: "PATCH",
-    headers: notionHeaders,
+    headers: notionHeaders(),
     body: JSON.stringify({ properties }),
   });
   if (!res.ok) throw new Error(`Notion update failed: ${await res.text()}`);
@@ -150,15 +169,15 @@ function getText(prop: any): string {
 
 export async function generateDrafts(): Promise<{ count: number }> {
   // Get recent posts for rotation
-  const recent = await queryNotionDb(THREADS_DB, undefined,
+  const recent = await queryNotionDb(env.threadsDb, undefined,
     [{ timestamp: "created_time", direction: "descending" }], 6);
   const recentTypes = recent.slice(0, 2).map((p: any) => getText(p.properties["유형"]));
   const recentContents = recent.slice(0, 3).map((p: any) => getText(p.properties["본문"]));
 
-  // Pick 2 different types
+  // Pick 1 type (하루에 1개만 생성)
   const available = POST_TYPES.filter(t => !recentTypes.includes(t));
   const shuffled = [...available].sort(() => Math.random() - 0.5);
-  const types = [shuffled[0], shuffled[1]];
+  const types = [shuffled[0]];
 
   let count = 0;
   for (const type of types) {
@@ -174,7 +193,7 @@ export async function generateDrafts(): Promise<{ count: number }> {
     if (!content || content.length > 500) continue;
 
     const preview = content.slice(0, 15).replace(/\n/g, " ");
-    await createNotionPage(THREADS_DB, {
+    await createNotionPage(env.threadsDb, {
       제목: { title: [{ text: { content: `[${type}] ${preview}...` } }] },
       본문: { rich_text: [{ text: { content } }] },
       유형: { select: { name: type } },
@@ -185,8 +204,8 @@ export async function generateDrafts(): Promise<{ count: number }> {
     count++;
 
     // Discord 알림
-    if (DISCORD_THREADS_WEBHOOK) {
-      await fetch(DISCORD_THREADS_WEBHOOK, {
+    if (env.discordWebhook) {
+      await fetch(env.discordWebhook, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -211,7 +230,7 @@ export async function generateDrafts(): Promise<{ count: number }> {
 }
 
 async function callGemini(prompt: string): Promise<string> {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${env.geminiKey}`;
 
   try {
     const res = await fetch(url, {
@@ -225,7 +244,7 @@ async function callGemini(prompt: string): Promise<string> {
 
     if (!res.ok) {
       // Fallback to gemma
-      const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemma-3-27b-it:generateContent?key=${GEMINI_API_KEY}`;
+      const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemma-3-27b-it:generateContent?key=${env.geminiKey}`;
       const fallbackRes = await fetch(fallbackUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -249,9 +268,9 @@ async function callGemini(prompt: string): Promise<string> {
 // --- Publish ---
 
 export async function publishApproved(): Promise<{ published: number }> {
-  if (!THREADS_USER_ID || !THREADS_ACCESS_TOKEN) return { published: 0 };
+  if (!env.userId || !env.accessToken) return { published: 0 };
 
-  const pages = await queryNotionDb(THREADS_DB, {
+  const pages = await queryNotionDb(env.threadsDb, {
     property: "상태", select: { equals: "승인" },
   });
 
@@ -284,22 +303,22 @@ export async function publishApproved(): Promise<{ published: number }> {
 
     try {
       // Create container
-      const createRes = await fetch(`${BASE_URL}/${THREADS_USER_ID}/threads`, {
+      const createRes = await fetch(`${BASE_URL}/${env.userId}/threads`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          media_type: "TEXT", text: content, access_token: THREADS_ACCESS_TOKEN,
+          media_type: "TEXT", text: content, access_token: env.accessToken,
         }),
       });
       if (!createRes.ok) throw new Error(await createRes.text());
       const { id: containerId } = await createRes.json();
 
       // Publish container
-      const pubRes = await fetch(`${BASE_URL}/${THREADS_USER_ID}/threads_publish`, {
+      const pubRes = await fetch(`${BASE_URL}/${env.userId}/threads_publish`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          creation_id: containerId, access_token: THREADS_ACCESS_TOKEN,
+          creation_id: containerId, access_token: env.accessToken,
         }),
       });
       if (!pubRes.ok) throw new Error(await pubRes.text());
@@ -307,7 +326,7 @@ export async function publishApproved(): Promise<{ published: number }> {
 
       // Get permalink
       const linkRes = await fetch(
-        `${BASE_URL}/${postId}?fields=permalink&access_token=${THREADS_ACCESS_TOKEN}`
+        `${BASE_URL}/${postId}?fields=permalink&access_token=${env.accessToken}`
       );
       let permalink = `threads-post-${postId}`;
       if (linkRes.ok) {
@@ -321,8 +340,8 @@ export async function publishApproved(): Promise<{ published: number }> {
       });
 
       // Discord notification
-      if (DISCORD_THREADS_WEBHOOK) {
-        await fetch(DISCORD_THREADS_WEBHOOK, {
+      if (env.discordWebhook) {
+        await fetch(env.discordWebhook, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -410,7 +429,7 @@ async function saveReplyIfNew(
   let collected = 0;
 
   // Check if already saved
-  const existing = await queryNotionDb(REPLIES_DB, {
+  const existing = await queryNotionDb(env.repliesDb, {
     property: "Reply ID", rich_text: { equals: reply.id },
   }, undefined, 1);
 
@@ -430,7 +449,7 @@ async function saveReplyIfNew(
       draftStatus = draftReply ? "초안" : "불필요";
     }
 
-    await createNotionPage(REPLIES_DB, {
+    await createNotionPage(env.repliesDb, {
       제목: { title: [{ text: { content: `${prefix}: ${(reply.text || "").slice(0, 30)}...` } }] },
       댓글내용: { rich_text: [{ text: { content: reply.text || "" } }] },
       작성자: { rich_text: [{ text: { content: reply.username || "" } }] },
@@ -453,7 +472,7 @@ async function saveReplyIfNew(
   // Fetch nested replies (replies to this reply)
   try {
     const nestedRes = await fetch(
-      `${BASE_URL}/${reply.id}/replies?fields=id,text,username,timestamp&access_token=${THREADS_ACCESS_TOKEN}`
+      `${BASE_URL}/${reply.id}/replies?fields=id,text,username,timestamp&access_token=${env.accessToken}`
     );
     if (nestedRes.ok) {
       const nestedData = await nestedRes.json();
@@ -470,14 +489,14 @@ async function saveReplyIfNew(
 }
 
 export async function collectReplies(): Promise<{ collected: number }> {
-  if (!THREADS_USER_ID || !THREADS_ACCESS_TOKEN) return { collected: 0 };
+  if (!env.userId || !env.accessToken) return { collected: 0 };
 
-  const published = await queryNotionDb(THREADS_DB, {
+  const published = await queryNotionDb(env.threadsDb, {
     property: "상태", select: { equals: "발행완료" },
   });
 
   const postsRes = await fetch(
-    `${BASE_URL}/${THREADS_USER_ID}/threads?fields=id,text,permalink&access_token=${THREADS_ACCESS_TOKEN}&limit=50`
+    `${BASE_URL}/${env.userId}/threads?fields=id,text,permalink&access_token=${env.accessToken}&limit=50`
   );
   if (!postsRes.ok) return { collected: 0 };
   const postsData = await postsRes.json();
@@ -494,7 +513,7 @@ export async function collectReplies(): Promise<{ collected: number }> {
 
     try {
       const repliesRes = await fetch(
-        `${BASE_URL}/${threadsPost.id}/replies?fields=id,text,username,timestamp&access_token=${THREADS_ACCESS_TOKEN}`
+        `${BASE_URL}/${threadsPost.id}/replies?fields=id,text,username,timestamp&access_token=${env.accessToken}`
       );
       if (!repliesRes.ok) continue;
       const repliesData = await repliesRes.json();
@@ -517,29 +536,29 @@ export async function collectReplies(): Promise<{ collected: number }> {
 // --- Publish Reply ---
 
 export async function publishReply(replyPageId: string, replyText: string, replyToId: string): Promise<{ success: boolean }> {
-  if (!THREADS_USER_ID || !THREADS_ACCESS_TOKEN) return { success: false };
+  if (!env.userId || !env.accessToken) return { success: false };
 
   // Create reply container
-  const createRes = await fetch(`${BASE_URL}/${THREADS_USER_ID}/threads`, {
+  const createRes = await fetch(`${BASE_URL}/${env.userId}/threads`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       media_type: "TEXT",
       text: replyText,
       reply_to_id: replyToId,
-      access_token: THREADS_ACCESS_TOKEN,
+      access_token: env.accessToken,
     }),
   });
   if (!createRes.ok) throw new Error(await createRes.text());
   const { id: containerId } = await createRes.json();
 
   // Publish
-  const pubRes = await fetch(`${BASE_URL}/${THREADS_USER_ID}/threads_publish`, {
+  const pubRes = await fetch(`${BASE_URL}/${env.userId}/threads_publish`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       creation_id: containerId,
-      access_token: THREADS_ACCESS_TOKEN,
+      access_token: env.accessToken,
     }),
   });
   if (!pubRes.ok) throw new Error(await pubRes.text());
@@ -556,10 +575,10 @@ export async function publishReply(replyPageId: string, replyText: string, reply
 // --- Sync Manual Posts ---
 
 export async function syncThreadsPosts(): Promise<{ synced: number }> {
-  if (!THREADS_USER_ID || !THREADS_ACCESS_TOKEN) return { synced: 0 };
+  if (!env.userId || !env.accessToken) return { synced: 0 };
 
   const postsRes = await fetch(
-    `${BASE_URL}/${THREADS_USER_ID}/threads?fields=id,text,timestamp,permalink&access_token=${THREADS_ACCESS_TOKEN}&limit=20`
+    `${BASE_URL}/${env.userId}/threads?fields=id,text,timestamp,permalink&access_token=${env.accessToken}&limit=20`
   );
   if (!postsRes.ok) return { synced: 0 };
   const postsData = await postsRes.json();
@@ -569,13 +588,13 @@ export async function syncThreadsPosts(): Promise<{ synced: number }> {
   for (const post of posts) {
     if (!post.permalink) continue;
 
-    const existing = await queryNotionDb(THREADS_DB, {
+    const existing = await queryNotionDb(env.threadsDb, {
       property: "Threads URL", url: { equals: post.permalink },
     }, undefined, 1);
     if (existing.length > 0) continue;
 
     const preview = (post.text || "").slice(0, 15).replace(/\n/g, " ");
-    await createNotionPage(THREADS_DB, {
+    await createNotionPage(env.threadsDb, {
       제목: { title: [{ text: { content: `[수동] ${preview}...` } }] },
       본문: { rich_text: [{ text: { content: post.text || "" } }] },
       유형: { select: { name: "공감형" } },
