@@ -172,11 +172,16 @@ function ThreadsContent() {
       const { id } = await createRes.json();
 
       if (publishAfterCreate) {
-        // 바로 발행
+        // 승인 상태로 변경 후 발행
+        await fetch(`/api/threads/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "승인" }),
+        });
         const pubRes = await fetch("/api/threads/publish-now", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id }),
+          body: JSON.stringify({ pageId: id }),
         });
         if (!pubRes.ok) throw new Error("발행 실패");
         toast.success("작성 후 바로 발행 완료!");
