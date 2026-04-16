@@ -93,6 +93,7 @@ function ThreadsContent() {
   const [newType, setNewType] = useState("공감형");
   const [publishAfterCreate, setPublishAfterCreate] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [polishing, setPolishing] = useState(false);
 
   const filteredPosts = filter === "all" ? posts : posts.filter((p) => p.status === filter);
 
@@ -194,6 +195,31 @@ function ThreadsContent() {
       toast.error("실패했습니다.");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handlePolish = async () => {
+    if (!newContent.trim()) {
+      toast.error("내용을 먼저 입력해주세요.");
+      return;
+    }
+    setPolishing(true);
+    try {
+      const res = await fetch("/api/threads/polish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: newContent }),
+      });
+      if (!res.ok) throw new Error("다듬기 실패");
+      const { polished } = await res.json();
+      if (polished) {
+        setNewContent(polished);
+        toast.success("AI가 다듬었습니다. 확인 후 수정하세요.");
+      }
+    } catch {
+      toast.error("다듬기에 실패했습니다.");
+    } finally {
+      setPolishing(false);
     }
   };
 
@@ -812,15 +838,28 @@ function ThreadsContent() {
                 className="mt-1 w-full rounded-lg border border-gray-200 p-3 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
               />
             </div>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={publishAfterCreate}
-                onChange={(e) => setPublishAfterCreate(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300"
-              />
-              <span className="text-sm text-gray-700">작성 후 바로 Threads에 발행</span>
-            </label>
+            <div className="flex items-center justify-between">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handlePolish}
+                disabled={polishing || !newContent.trim()}
+                className="rounded-lg text-xs"
+              >
+                <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+                {polishing ? "다듬는 중..." : "AI 다듬기"}
+              </Button>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={publishAfterCreate}
+                  onChange={(e) => setPublishAfterCreate(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300"
+                />
+                <span className="text-sm text-gray-700">바로 발행</span>
+              </label>
+            </div>
             <div className="flex justify-end gap-2 pt-2">
               <Button type="button" variant="outline" onClick={() => setWriteOpen(false)}>
                 취소
