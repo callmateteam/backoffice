@@ -38,6 +38,7 @@ import {
   Repeat2,
   Quote,
   Share2,
+  Search,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -260,6 +261,12 @@ function ThreadsContent() {
               <Pencil className="mr-2 h-4 w-4" />
               직접 작성
             </Button>
+            <Link href="/threads/monitor">
+              <Button variant="outline" className="rounded-xl">
+                <Search className="mr-2 h-4 w-4" />
+                모니터링
+              </Button>
+            </Link>
             <Link href="/threads/replies">
               <Button variant="outline" className="rounded-xl">
                 <MessageCircle className="mr-2 h-4 w-4" />
