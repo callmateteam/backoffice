@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const res = await fetch(
-      `${THREADS_API}/${userId}/threads_search?q=${encodeURIComponent(query)}&fields=id,text,username,timestamp,permalink&access_token=${accessToken}`
+      `${THREADS_API}/keyword_search?q=${encodeURIComponent(query)}&search_type=RECENT&fields=id,text,username,timestamp,permalink&access_token=${accessToken}`
     );
 
     if (!res.ok) {
