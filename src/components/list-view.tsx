@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   todo: { label: "할 일", className: "bg-gray-100 text-gray-600" },
-  "in-progress": { label: "진행 중", className: "bg-blue-50 text-blue-600" },
+  "in-progress": { label: "진행 중", className: "bg-fuchsia-50 text-fuchsia-600" },
   done: { label: "완료", className: "bg-emerald-50 text-emerald-600" },
 };
 
@@ -93,7 +93,7 @@ export function ListView() {
                 className={cn(
                   "flex-1 rounded-lg px-3 py-1.5 text-sm font-medium transition-all sm:flex-none",
                   statusFilter === opt.value
-                    ? "bg-indigo-600 text-white shadow-sm"
+                    ? "bg-rose-400 text-white shadow-sm"
                     : "text-gray-500 hover:text-gray-700"
                 )}
               >
@@ -103,7 +103,7 @@ export function ListView() {
           </div>
         </div>
         <Button
-          className="w-full rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-violet-700 sm:w-auto"
+          className="w-full rounded-xl bg-linear-to-r from-rose-400 to-fuchsia-400 shadow-md shadow-rose-200 hover:from-rose-500 hover:to-fuchsia-500 sm:w-auto"
           onClick={() => { setSelectedSchedule(null); setFormOpen(true); }}
         >
           <Plus className="mr-2 h-4 w-4" />

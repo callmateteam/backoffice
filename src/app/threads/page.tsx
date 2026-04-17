@@ -48,24 +48,24 @@ import { cn } from "@/lib/utils";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   초안: { label: "초안", color: "text-gray-600", bg: "bg-gray-100" },
-  승인: { label: "승인", color: "text-blue-600", bg: "bg-blue-100" },
-  발행중: { label: "발행중", color: "text-yellow-600", bg: "bg-yellow-100" },
-  발행완료: { label: "발행완료", color: "text-green-600", bg: "bg-green-100" },
-  발행실패: { label: "발행실패", color: "text-red-600", bg: "bg-red-100" },
+  승인: { label: "승인", color: "text-fuchsia-600", bg: "bg-fuchsia-50" },
+  발행중: { label: "발행중", color: "text-amber-600", bg: "bg-amber-50" },
+  발행완료: { label: "발행완료", color: "text-emerald-600", bg: "bg-emerald-50" },
+  발행실패: { label: "발행실패", color: "text-rose-600", bg: "bg-rose-100" },
   폐기: { label: "폐기", color: "text-gray-400", bg: "bg-gray-50" },
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  공감형: "bg-blue-50 text-blue-700",
-  고백형: "bg-purple-50 text-purple-700",
-  반전형: "bg-yellow-50 text-yellow-700",
-  인사이트형: "bg-green-50 text-green-700",
-  논쟁형: "bg-red-50 text-red-700",
-  질문형: "bg-orange-50 text-orange-700",
-  미시서사형: "bg-pink-50 text-pink-700",
+  공감형: "bg-rose-50 text-rose-600",
+  고백형: "bg-fuchsia-50 text-fuchsia-600",
+  반전형: "bg-amber-50 text-amber-600",
+  인사이트형: "bg-emerald-50 text-emerald-600",
+  논쟁형: "bg-rose-50 text-rose-700",
+  질문형: "bg-fuchsia-50 text-fuchsia-700",
+  미시서사형: "bg-rose-50 text-rose-500",
   MBTI형: "bg-gray-50 text-gray-700",
   아무도안말하는형: "bg-amber-50 text-amber-700",
-  관점전환형: "bg-teal-50 text-teal-700",
+  관점전환형: "bg-emerald-50 text-emerald-700",
 };
 
 export default function ThreadsPage() {
@@ -256,7 +256,7 @@ function ThreadsContent() {
           <div className="flex gap-2">
             <Button
               onClick={() => setWriteOpen(true)}
-              className="rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-violet-700"
+              className="rounded-xl bg-linear-to-r from-rose-400 to-fuchsia-400 shadow-md shadow-rose-200 hover:from-rose-500 hover:to-fuchsia-500"
             >
               <Pencil className="mr-2 h-4 w-4" />
               직접 작성
@@ -277,7 +277,7 @@ function ThreadsContent() {
             className={cn(
               "rounded-full px-3 py-1 text-sm font-medium transition-colors",
               filter === "all"
-                ? "bg-indigo-100 text-indigo-700"
+                ? "bg-rose-100 text-rose-600"
                 : "bg-gray-100 text-gray-500 hover:bg-gray-200"
             )}
           >
@@ -384,7 +384,7 @@ function ThreadsContent() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="h-7 w-7 p-0 text-green-600 hover:bg-green-50"
+                            className="h-7 w-7 p-0 text-emerald-600 hover:bg-emerald-50"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleApprove(post.id);
@@ -408,7 +408,7 @@ function ThreadsContent() {
                       {post.status === "승인" && (
                         <Button
                           size="sm"
-                          className="mt-2 h-7 bg-indigo-600 text-xs hover:bg-indigo-700"
+                          className="mt-2 h-7 bg-rose-400 text-xs hover:bg-rose-500"
                           disabled={publishNow.isPending}
                           onClick={async (e) => {
                             e.stopPropagation();
@@ -470,7 +470,7 @@ function ThreadsContent() {
               <div className="space-y-4">
                 {selectedPost.status === "초안" ? (
                   <textarea
-                    className="w-full rounded-lg border border-gray-200 p-3 text-sm leading-relaxed focus:border-indigo-300 focus:ring-1 focus:ring-indigo-300 focus:outline-none"
+                    className="w-full rounded-lg border border-gray-200 p-3 text-sm leading-relaxed focus:border-rose-300 focus:ring-1 focus:ring-rose-300 focus:outline-none"
                     rows={8}
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
@@ -486,7 +486,7 @@ function ThreadsContent() {
                     href={selectedPost.threadsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-sm text-indigo-600 hover:underline"
+                    className="flex items-center gap-1 text-sm text-rose-500 hover:underline"
                   >
                     <ExternalLink className="h-3 w-3" />
                     Threads에서 보기
@@ -579,12 +579,12 @@ function ThreadsContent() {
 
                   // Color map for usernames
                   const colorPalette = [
-                    "from-blue-100 to-blue-200 text-blue-600",
-                    "from-purple-100 to-purple-200 text-purple-600",
-                    "from-green-100 to-green-200 text-green-600",
-                    "from-orange-100 to-orange-200 text-orange-600",
-                    "from-pink-100 to-pink-200 text-pink-600",
-                    "from-teal-100 to-teal-200 text-teal-600",
+                    "from-fuchsia-100 to-fuchsia-200 text-fuchsia-600",
+                    "from-fuchsia-100 to-fuchsia-200 text-fuchsia-600",
+                    "from-emerald-100 to-emerald-200 text-emerald-600",
+                    "from-amber-100 to-amber-200 text-amber-600",
+                    "from-rose-100 to-rose-200 text-rose-600",
+                    "from-emerald-100 to-emerald-200 text-emerald-600",
                   ];
                   const userColors: Record<string, string> = {};
                   let colorIdx = 0;
@@ -619,7 +619,7 @@ function ThreadsContent() {
                           const colors = userColors[reply.username] || colorPalette[0];
                           const [gradientColors, textColor] = [
                             colors.split(" ").slice(0, 2).join(" "),
-                            colors.split(" ")[2] || "text-indigo-600",
+                            colors.split(" ")[2] || "text-rose-500",
                           ];
 
                           return (
@@ -627,12 +627,12 @@ function ThreadsContent() {
                               key={reply.id}
                               className={cn(
                                 "flex items-start gap-2.5 rounded-lg p-2 transition-colors",
-                                isNestedReply ? "ml-8 border-l-2 border-indigo-200 pl-3" : ""
+                                isNestedReply ? "ml-8 border-l-2 border-rose-200 pl-3" : ""
                               )}
                             >
                               <div
                                 className={cn(
-                                  "flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br",
+                                  "flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-linear-to-br",
                                   gradientColors
                                 )}
                               >
@@ -646,7 +646,7 @@ function ThreadsContent() {
                                     href={`https://www.threads.com/@${reply.username}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-xs font-semibold text-gray-900 hover:text-indigo-600 hover:underline"
+                                    className="text-xs font-semibold text-gray-900 hover:text-rose-500 hover:underline"
                                     onClick={(e) => e.stopPropagation()}
                                   >
                                     @{reply.username}
@@ -666,19 +666,19 @@ function ThreadsContent() {
 
                                 {/* AI Draft Reply */}
                                 {reply.draftReply && reply.draftStatus && reply.draftStatus !== "불필요" && (
-                                  <div className="mt-2 rounded-lg border border-indigo-100 bg-indigo-50/50 p-2.5">
+                                  <div className="mt-2 rounded-lg border border-rose-100 bg-rose-50/50 p-2.5">
                                     <div className="mb-1.5 flex items-center gap-1.5">
-                                      <Sparkles className="h-3 w-3 text-indigo-500" />
-                                      <span className="text-xs font-medium text-indigo-600">AI 답글 초안</span>
+                                      <Sparkles className="h-3 w-3 text-rose-500" />
+                                      <span className="text-xs font-medium text-rose-500">AI 답글 초안</span>
                                       {reply.draftStatus === "발행완료" && (
-                                        <span className="rounded-full bg-green-100 px-1.5 py-0.5 text-xs text-green-600">발행됨</span>
+                                        <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-xs text-emerald-600">발행됨</span>
                                       )}
                                     </div>
 
                                     {editingDraftId === reply.id ? (
                                       <div className="space-y-2">
                                         <textarea
-                                          className="w-full rounded border border-indigo-200 bg-white p-2 text-sm focus:border-indigo-400 focus:outline-none"
+                                          className="w-full rounded border border-rose-200 bg-white p-2 text-sm focus:border-rose-300 focus:outline-none"
                                           rows={3}
                                           value={editingDraftText}
                                           onChange={(e) => setEditingDraftText(e.target.value)}
@@ -714,7 +714,7 @@ function ThreadsContent() {
                                               onClick={async (e) => { e.stopPropagation(); await updateReplyDraft.mutateAsync({ id: reply.id, draftStatus: "불필요" }); toast.success("무시됨"); }}>
                                               <X className="mr-1 h-3 w-3" /> 무시
                                             </Button>
-                                            <Button size="sm" className="h-7 bg-indigo-600 text-xs hover:bg-indigo-700"
+                                            <Button size="sm" className="h-7 bg-rose-400 text-xs hover:bg-rose-500"
                                               disabled={publishReply.isPending}
                                               onClick={async (e) => {
                                                 e.stopPropagation();
@@ -777,7 +777,7 @@ function ThreadsContent() {
                         </Button>
                         <Button
                           size="sm"
-                          className="bg-green-600 hover:bg-green-700"
+                          className="bg-emerald-600 hover:bg-emerald-700"
                           onClick={() => handleApprove(selectedPost.id)}
                           disabled={updatePost.isPending}
                         >
@@ -789,7 +789,7 @@ function ThreadsContent() {
                     {selectedPost.status === "승인" && (
                       <Button
                         size="sm"
-                        className="bg-indigo-600 hover:bg-indigo-700"
+                        className="bg-rose-400 hover:bg-rose-500"
                         disabled={publishNow.isPending}
                         onClick={async () => {
                           try {
@@ -825,7 +825,7 @@ function ThreadsContent() {
               <select
                 value={newType}
                 onChange={(e) => setNewType(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-400"
+                className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-rose-300"
               >
                 {Object.keys(TYPE_COLORS).map((t) => (
                   <option key={t} value={t}>{t}</option>
@@ -841,7 +841,7 @@ function ThreadsContent() {
                 onChange={(e) => setNewContent(e.target.value)}
                 placeholder="오늘 만난 사장님이..."
                 rows={10}
-                className="mt-1 w-full rounded-lg border border-gray-200 p-3 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                className="mt-1 w-full rounded-lg border border-gray-200 p-3 text-sm outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100"
               />
             </div>
             <div className="flex items-center justify-between">
@@ -873,7 +873,7 @@ function ThreadsContent() {
               <Button
                 onClick={handleCreateManual}
                 disabled={submitting || !newContent.trim()}
-                className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700"
+                className="bg-linear-to-r from-rose-400 to-fuchsia-400 hover:from-rose-500 hover:to-fuchsia-500"
               >
                 {submitting ? "처리 중..." : publishAfterCreate ? "작성 + 바로 발행" : "초안으로 저장"}
               </Button>

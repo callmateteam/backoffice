@@ -86,7 +86,7 @@ function RepliesContent() {
                       {postTitle}
                     </p>
                     <div className="flex items-center gap-2">
-                      <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-600">
+                      <span className="rounded-full bg-rose-100 px-2 py-0.5 text-xs font-medium text-rose-500">
                         {postReplies.length}개 댓글
                       </span>
                       {url && (
@@ -94,7 +94,7 @@ function RepliesContent() {
                           href={url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-400 hover:text-indigo-600"
+                          className="text-gray-400 hover:text-rose-500"
                         >
                           <ExternalLink className="h-3.5 w-3.5" />
                         </a>
@@ -108,8 +108,8 @@ function RepliesContent() {
                   {postReplies.map((reply) => (
                     <div key={reply.id} className="px-5 py-4">
                       <div className="flex items-start gap-3">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-100 to-violet-100">
-                          <User className="h-4 w-4 text-indigo-600" />
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-rose-100 to-fuchsia-100">
+                          <User className="h-4 w-4 text-rose-500" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">

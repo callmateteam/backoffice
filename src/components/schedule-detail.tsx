@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   todo: { label: "할 일", className: "bg-gray-100 text-gray-600" },
-  "in-progress": { label: "진행 중", className: "bg-blue-50 text-blue-600" },
+  "in-progress": { label: "진행 중", className: "bg-fuchsia-50 text-fuchsia-600" },
   done: { label: "완료", className: "bg-emerald-50 text-emerald-600" },
 };
 
@@ -128,7 +128,7 @@ export function ScheduleDetail({
                     <User className="h-4 w-4 text-muted-foreground shrink-0" />
                     <div className="flex flex-wrap gap-1">
                       {schedule.assignee.split(",").filter(Boolean).map((a) => (
-                        <span key={a} className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-600">
+                        <span key={a} className="rounded-full bg-rose-50 px-2 py-0.5 text-xs font-medium text-rose-500">
                           {getMemberName(a)}
                         </span>
                       ))}

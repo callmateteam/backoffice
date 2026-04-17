@@ -49,38 +49,38 @@
 }
 
 :root {
-  --background: #f8f9fc;
-  --foreground: #1a1a2e;
+  --background: #fdf8fb;
+  --foreground: #2a1a2e;
   --card: #ffffff;
-  --card-foreground: #1a1a2e;
+  --card-foreground: #2a1a2e;
   --popover: #ffffff;
-  --popover-foreground: #1a1a2e;
-  --primary: #4f46e5;
+  --popover-foreground: #2a1a2e;
+  --primary: #c87aa5;
   --primary-foreground: #ffffff;
-  --secondary: #f0efff;
-  --secondary-foreground: #4f46e5;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --accent: #f0efff;
-  --accent-foreground: #4f46e5;
+  --secondary: #fce7f3;
+  --secondary-foreground: #c87aa5;
+  --muted: #faf5f7;
+  --muted-foreground: #78687a;
+  --accent: #fce7f3;
+  --accent-foreground: #c87aa5;
   --destructive: #ef4444;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #4f46e5;
-  --chart-1: #4f46e5;
-  --chart-2: #06b6d4;
-  --chart-3: #8b5cf6;
+  --border: #f0e5ec;
+  --input: #f0e5ec;
+  --ring: #c87aa5;
+  --chart-1: #c87aa5;
+  --chart-2: #b49bd1;
+  --chart-3: #e8a8c8;
   --chart-4: #f59e0b;
-  --chart-5: #ec4899;
+  --chart-5: #a890c6;
   --radius: 0.75rem;
   --sidebar: #ffffff;
-  --sidebar-foreground: #1a1a2e;
-  --sidebar-primary: #4f46e5;
+  --sidebar-foreground: #2a1a2e;
+  --sidebar-primary: #c87aa5;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f0efff;
-  --sidebar-accent-foreground: #4f46e5;
-  --sidebar-border: #e2e8f0;
-  --sidebar-ring: #4f46e5;
+  --sidebar-accent: #fce7f3;
+  --sidebar-accent-foreground: #c87aa5;
+  --sidebar-border: #f0e5ec;
+  --sidebar-ring: #c87aa5;
 }
 
 @layer base {
@@ -119,16 +119,16 @@
 }
 
 .calendar-wrapper .fc .fc-button:hover {
-  background-color: #f0efff;
-  border-color: #c7d2fe;
-  color: #4f46e5;
+  background-color: #fce7f3;
+  border-color: #f3c3da;
+  color: #c87aa5;
 }
 
 .calendar-wrapper .fc .fc-button-active {
-  background-color: #4f46e5 !important;
+  background-color: #c87aa5 !important;
   color: white !important;
-  border-color: #4f46e5 !important;
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3) !important;
+  border-color: #c87aa5 !important;
+  box-shadow: 0 2px 8px rgba(200, 122, 165, 0.3) !important;
 }
 
 .calendar-wrapper .fc .fc-daygrid-day-number {
@@ -139,11 +139,11 @@
 }
 
 .calendar-wrapper .fc .fc-day-today {
-  background-color: #f0efff !important;
+  background-color: #fce7f3 !important;
 }
 
 .calendar-wrapper .fc .fc-day-today .fc-daygrid-day-number {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  background: linear-gradient(135deg, #c87aa5, #a890c6);
   color: white;
   border-radius: 50%;
   width: 1.75rem;
@@ -172,7 +172,7 @@
 
 .calendar-wrapper .fc .fc-daygrid-more-link {
   font-size: 0.75rem;
-  color: #4f46e5;
+  color: #c87aa5;
   font-weight: 600;
 }
 
@@ -224,15 +224,15 @@
 .notice-content ul { list-style: disc; padding-left: 1.5rem; margin-bottom: 0.5rem; }
 .notice-content ol { list-style: decimal; padding-left: 1.5rem; margin-bottom: 0.5rem; }
 .notice-content li { margin-bottom: 0.25rem; }
-.notice-content a { color: #4f46e5; text-decoration: underline; }
+.notice-content a { color: #c87aa5; text-decoration: underline; }
 .notice-content strong { font-weight: 600; }
 .notice-content em { font-style: italic; }
 .notice-content s { text-decoration: line-through; }
 .notice-content u { text-decoration: underline; }
 
 /* 마크다운 렌더링 (업무일지) */
-.md-content h2 { font-size: 1rem; font-weight: 700; color: #1a1a2e; margin: 16px 0 8px; padding-bottom: 6px; border-bottom: 2px solid #f0efff; }
+.md-content h2 { font-size: 1rem; font-weight: 700; color: #1a1a2e; margin: 16px 0 8px; padding-bottom: 6px; border-bottom: 2px solid #fce7f3; }
 .md-content h2:first-child { margin-top: 0; }
-.md-content h3 { font-size: 0.9rem; font-weight: 600; color: #4f46e5; margin: 12px 0 6px; }
-.md-content code { background: #f0efff; color: #4f46e5; padding: 1px 6px; border-radius: 4px; font-size: 0.85em; }
+.md-content h3 { font-size: 0.9rem; font-weight: 600; color: #c87aa5; margin: 12px 0 6px; }
+.md-content code { background: #fce7f3; color: #c87aa5; padding: 1px 6px; border-radius: 4px; font-size: 0.85em; }
 .md-content li::marker { color: #c7d2fe; }

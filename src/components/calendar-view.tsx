@@ -65,7 +65,7 @@ export function CalendarView() {
 
       <div className="flex justify-end">
         <Button
-          className="rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-violet-700"
+          className="rounded-xl bg-linear-to-r from-rose-400 to-fuchsia-400 shadow-md shadow-rose-200 hover:from-rose-500 hover:to-fuchsia-500"
           onClick={() => { setSelectedSchedule(null); setDefaultDate(""); setFormOpen(true); }}
         >
           <Plus className="mr-2 h-4 w-4" />

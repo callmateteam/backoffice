@@ -95,7 +95,7 @@ export function NoticesContent({ userEmail, embedded }: { userEmail: string; emb
             <p className="mt-1 text-sm text-gray-500">팀 공지사항을 확인하세요</p>
           </div>
           <Button
-            className="rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-violet-700"
+            className="rounded-xl bg-linear-to-r from-rose-400 to-fuchsia-400 shadow-md shadow-rose-200 hover:from-rose-500 hover:to-fuchsia-500"
             onClick={() => setFormOpen(true)}
           >
             <Plus className="mr-2 h-4 w-4" />
@@ -106,7 +106,7 @@ export function NoticesContent({ userEmail, embedded }: { userEmail: string; emb
       {embedded && (
         <div className="mb-4 flex justify-end">
           <Button
-            className="rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-violet-700"
+            className="rounded-xl bg-linear-to-r from-rose-400 to-fuchsia-400 shadow-md shadow-rose-200 hover:from-rose-500 hover:to-fuchsia-500"
             onClick={() => setFormOpen(true)}
           >
             <Plus className="mr-2 h-4 w-4" />
@@ -140,7 +140,7 @@ export function NoticesContent({ userEmail, embedded }: { userEmail: string; emb
                     </p>
                   </div>
                   <div className="shrink-0 text-right">
-                    <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600">
+                    <span className="rounded-full bg-rose-50 px-2.5 py-0.5 text-xs font-medium text-rose-500">
                       {getMemberName(notice.author)}
                     </span>
                     <p className="mt-1 text-xs text-gray-400">{formatDate(notice.createdAt)}</p>
@@ -210,7 +210,7 @@ export function NoticesContent({ userEmail, embedded }: { userEmail: string; emb
               </DialogHeader>
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600">
+                  <span className="rounded-full bg-rose-50 px-2.5 py-0.5 text-xs font-medium text-rose-500">
                     {getMemberName(selectedNotice.author)}
                   </span>
                   <span>{formatDate(selectedNotice.createdAt)}</span>

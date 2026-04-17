@@ -24,10 +24,10 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 const MEMBER_COLORS: Record<string, string> = {
-  "victory.jun01@gmail.com": "from-indigo-500 to-violet-500",
-  "ihayoem@gmail.com": "from-pink-500 to-rose-500",
-  "workingminjee@gmail.com": "from-emerald-500 to-teal-500",
-  "jbinyim991214@gmail.com": "from-amber-500 to-orange-500",
+  "victory.jun01@gmail.com": "from-rose-400 to-fuchsia-400",
+  "ihayoem@gmail.com": "from-fuchsia-400 to-rose-300",
+  "workingminjee@gmail.com": "from-emerald-400 to-rose-300",
+  "jbinyim991214@gmail.com": "from-amber-400 to-rose-300",
 };
 
 type ViewMode = "day" | "week" | "month";
@@ -57,6 +57,7 @@ export function WorkLogsContent({ userEmail, embedded }: { userEmail: string; em
   const [todayWork, setTodayWork] = useState("");
   const [notes, setNotes] = useState("");
   const [tomorrowWork, setTomorrowWork] = useState("");
+  const [workDate, setWorkDate] = useState(format(new Date(), "yyyy-MM-dd"));
 
   // 수정 폼
   const [editContent, setEditContent] = useState("");
@@ -123,9 +124,10 @@ export function WorkLogsContent({ userEmail, embedded }: { userEmail: string; em
     e.preventDefault();
     if (!todayWork.trim()) { toast.error("오늘 진행 업무를 입력해주세요."); return; }
     try {
-      await createWorkLog.mutateAsync({ date: todayStr, content: buildContent() });
+      await createWorkLog.mutateAsync({ date: workDate, content: buildContent() });
       toast.success("업무일지가 작성되었습니다.");
       setTodayWork(""); setNotes(""); setTomorrowWork("");
+      setWorkDate(format(new Date(), "yyyy-MM-dd"));
       setFormOpen(false);
     } catch { toast.error("작성에 실패했습니다."); }
   };
@@ -176,7 +178,7 @@ export function WorkLogsContent({ userEmail, embedded }: { userEmail: string; em
             <p className="mt-1 text-sm text-gray-500">매일 업무 내용을 기록하고 팀원들의 진행 상황을 확인하세요</p>
           </div>
           <Button
-            className="rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-violet-700"
+            className="rounded-xl bg-linear-to-r from-rose-400 to-fuchsia-400 shadow-md shadow-rose-200 hover:from-rose-500 hover:to-fuchsia-500"
             onClick={() => setFormOpen(true)}
           >
             <Plus className="mr-2 h-4 w-4" /> 오늘 일지 작성
@@ -186,7 +188,7 @@ export function WorkLogsContent({ userEmail, embedded }: { userEmail: string; em
       {embedded && (
         <div className="mb-4 flex justify-end">
           <Button
-            className="rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-violet-700"
+            className="rounded-xl bg-linear-to-r from-rose-400 to-fuchsia-400 shadow-md shadow-rose-200 hover:from-rose-500 hover:to-fuchsia-500"
             onClick={() => setFormOpen(true)}
           >
             <Plus className="mr-2 h-4 w-4" /> 오늘 일지 작성
@@ -200,12 +202,12 @@ export function WorkLogsContent({ userEmail, embedded }: { userEmail: string; em
           {/* 멤버 필터 */}
           <div className="flex rounded-xl border border-gray-200 bg-white p-0.5">
             <button onClick={() => setAssigneeFilter("all")}
-              className={cn("rounded-lg px-3 py-1.5 text-xs font-medium transition-all", assigneeFilter === "all" ? "bg-indigo-600 text-white" : "text-gray-500")}>
+              className={cn("rounded-lg px-3 py-1.5 text-xs font-medium transition-all", assigneeFilter === "all" ? "bg-rose-400 text-white" : "text-gray-500")}>
               전체
             </button>
             {assignees.map((a) => (
               <button key={a} onClick={() => setAssigneeFilter(a)}
-                className={cn("rounded-lg px-3 py-1.5 text-xs font-medium transition-all", assigneeFilter === a ? "bg-indigo-600 text-white" : "text-gray-500")}>
+                className={cn("rounded-lg px-3 py-1.5 text-xs font-medium transition-all", assigneeFilter === a ? "bg-rose-400 text-white" : "text-gray-500")}>
                 {getMemberName(a)}
               </button>
             ))}
@@ -215,7 +217,7 @@ export function WorkLogsContent({ userEmail, embedded }: { userEmail: string; em
           <div className="flex rounded-xl border border-gray-200 bg-white p-0.5">
             {(["day", "week", "month"] as ViewMode[]).map((v) => (
               <button key={v} onClick={() => setViewMode(v)}
-                className={cn("rounded-lg px-3 py-1.5 text-xs font-medium transition-all", viewMode === v ? "bg-indigo-600 text-white" : "text-gray-500")}>
+                className={cn("rounded-lg px-3 py-1.5 text-xs font-medium transition-all", viewMode === v ? "bg-rose-400 text-white" : "text-gray-500")}>
                 {v === "day" ? "일별" : v === "week" ? "주별" : "월별"}
               </button>
             ))}
@@ -266,7 +268,7 @@ export function WorkLogsContent({ userEmail, embedded }: { userEmail: string; em
                     </div>
                   </div>
                 </div>
-                <span className="shrink-0 rounded-xl bg-indigo-50 px-3 py-1.5 text-xs font-bold text-indigo-600">{log.date}</span>
+                <span className="shrink-0 rounded-xl bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-500">{log.date}</span>
               </div>
             </div>
           ))}
@@ -277,22 +279,29 @@ export function WorkLogsContent({ userEmail, embedded }: { userEmail: string; em
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
         <DialogContent className="sm:max-w-xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <div className="flex items-center justify-between">
-              <DialogTitle>오늘 업무일지 작성</DialogTitle>
-              <span className="rounded-lg bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-600">{format(new Date(), "yyyy.MM.dd (EEE)", { locale: ko })}</span>
-            </div>
+            <DialogTitle>업무일지 작성</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreate} className="space-y-5">
             <div className="space-y-1.5">
-              <Label className="flex items-center gap-2 text-indigo-600 font-bold">
-                <span className="h-1.5 w-1.5 rounded-full bg-indigo-600" /> 오늘 진행 업무 *
+              <Label className="font-semibold text-gray-700">날짜</Label>
+              <input
+                type="date"
+                value={workDate}
+                onChange={(e) => setWorkDate(e.target.value)}
+                className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="font-semibold text-gray-700">
+                <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-rose-400 align-middle" />오늘 진행 업무 *
               </Label>
               <textarea
                 value={todayWork}
                 onChange={(e) => setTodayWork(e.target.value)}
                 placeholder={"- 모델 학습 데이터 전처리 완료\n- 데이터 증강 파이프라인 테스트"}
                 rows={5}
-                className="w-full rounded-xl border border-gray-200 p-3 font-mono text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                className="w-full rounded-xl border border-gray-200 p-3 font-mono text-sm outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100"
               />
             </div>
 
@@ -366,7 +375,7 @@ export function WorkLogsContent({ userEmail, embedded }: { userEmail: string; em
                   value={editContent}
                   onChange={(e) => setEditContent(e.target.value)}
                   rows={15}
-                  className="w-full rounded-xl border border-gray-200 p-4 font-mono text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                  className="w-full rounded-xl border border-gray-200 p-4 font-mono text-sm outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100"
                 />
               ) : (
                 <div

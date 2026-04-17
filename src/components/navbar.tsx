@@ -27,7 +27,7 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-indigo-100/50 bg-white/80 backdrop-blur-lg">
+    <nav className="sticky top-0 z-40 border-b border-rose-100/50 bg-white/80 backdrop-blur-lg">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2.5">
@@ -47,7 +47,7 @@ export function Navbar() {
                     className={cn(
                       "flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-all",
                       isActive
-                        ? "bg-indigo-50 text-indigo-700 shadow-sm"
+                        ? "bg-rose-50 text-rose-600 shadow-sm"
                         : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                     )}
                   >
@@ -63,10 +63,10 @@ export function Navbar() {
         <div className="flex items-center gap-3">
           {session?.user && (
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-2.5 rounded-full border border-gray-200 py-1.5 pl-1.5 pr-3 text-sm transition-colors hover:border-indigo-200 hover:bg-indigo-50/50">
-                <Avatar className="h-7 w-7 ring-2 ring-indigo-100">
+              <DropdownMenuTrigger className="flex items-center gap-2.5 rounded-full border border-gray-200 py-1.5 pl-1.5 pr-3 text-sm transition-colors hover:border-rose-200 hover:bg-rose-50/50">
+                <Avatar className="h-7 w-7 ring-2 ring-rose-100">
                   <AvatarImage src={session.user.image || ""} />
-                  <AvatarFallback className="bg-linear-to-br from-indigo-500 to-violet-500 text-xs text-white">
+                  <AvatarFallback className="bg-linear-to-br from-rose-400 to-fuchsia-400 text-xs text-white">
                     {session.user.name?.[0] || "U"}
                   </AvatarFallback>
                 </Avatar>
@@ -107,7 +107,7 @@ export function Navbar() {
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-indigo-50 text-indigo-700"
+                      ? "bg-rose-50 text-rose-600"
                       : "text-gray-600 hover:bg-gray-50"
                   )}
                 >

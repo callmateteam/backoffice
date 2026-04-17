@@ -22,7 +22,7 @@ export function AssigneeFilter({ assignees, selected, onChange }: AssigneeFilter
           className={cn(
             "rounded-full px-3 py-1 text-xs font-medium transition-all",
             selected === "all"
-              ? "bg-indigo-600 text-white shadow-sm"
+              ? "bg-rose-400 text-white shadow-sm"
               : "bg-gray-100 text-gray-500 hover:bg-gray-200"
           )}
         >
@@ -35,7 +35,7 @@ export function AssigneeFilter({ assignees, selected, onChange }: AssigneeFilter
             className={cn(
               "rounded-full px-3 py-1 text-xs font-medium transition-all",
               selected === a
-                ? "bg-indigo-600 text-white shadow-sm"
+                ? "bg-rose-400 text-white shadow-sm"
                 : "bg-gray-100 text-gray-500 hover:bg-gray-200"
             )}
           >

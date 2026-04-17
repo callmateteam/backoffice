@@ -50,7 +50,7 @@ function getStatus(meeting: Meeting): { label: string; className: string } {
   if (minutesText) return { label: "회의록 작성됨", className: "bg-emerald-50 text-emerald-600" };
   const agendaText = meeting.agenda?.replace(/<[^>]*>/g, "").trim();
   if (agendaText) return { label: "안건 작성됨", className: "bg-amber-50 text-amber-600" };
-  return { label: "예정", className: "bg-blue-50 text-blue-600" };
+  return { label: "예정", className: "bg-fuchsia-50 text-fuchsia-600" };
 }
 
 export default function MeetingsPage() {
@@ -161,7 +161,7 @@ export function MeetingsContent({ embedded }: { embedded?: boolean }) {
             <p className="mt-1 text-sm text-gray-500">팀 회의를 관리하고 회의록을 작성하세요</p>
           </div>
           <Button
-            className="rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-violet-700"
+            className="rounded-xl bg-linear-to-r from-rose-400 to-fuchsia-400 shadow-md shadow-rose-200 hover:from-rose-500 hover:to-fuchsia-500"
             onClick={() => setFormOpen(true)}
           >
             <Plus className="mr-2 h-4 w-4" /> 새 회의
@@ -171,7 +171,7 @@ export function MeetingsContent({ embedded }: { embedded?: boolean }) {
       {embedded && (
         <div className="mb-4 flex justify-end">
           <Button
-            className="rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-violet-700"
+            className="rounded-xl bg-linear-to-r from-rose-400 to-fuchsia-400 shadow-md shadow-rose-200 hover:from-rose-500 hover:to-fuchsia-500"
             onClick={() => setFormOpen(true)}
           >
             <Plus className="mr-2 h-4 w-4" /> 새 회의
@@ -210,14 +210,14 @@ export function MeetingsContent({ embedded }: { embedded?: boolean }) {
                     {m.participants && (
                       <div className="flex flex-wrap gap-1.5 mt-2.5">
                         {m.participants.split(",").filter(Boolean).map((p) => (
-                          <span key={p} className="rounded-full bg-indigo-50 px-2 py-0.5 text-[11px] font-medium text-indigo-600">
+                          <span key={p} className="rounded-full bg-rose-50 px-2 py-0.5 text-[11px] font-medium text-rose-500">
                             {getMemberName(p)}
                           </span>
                         ))}
                       </div>
                     )}
                   </div>
-                  <span className="shrink-0 rounded-xl bg-indigo-50 px-3 py-1.5 text-xs font-bold text-indigo-600">{m.date}</span>
+                  <span className="shrink-0 rounded-xl bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-500">{m.date}</span>
                 </div>
               </div>
             );
@@ -254,7 +254,7 @@ export function MeetingsContent({ embedded }: { embedded?: boolean }) {
                 {members.map((m) => (
                   <button key={m.email} type="button" onClick={() => toggleParticipant(m.email, participants, setParticipants)}
                     className={cn("rounded-full border px-3 py-1.5 text-sm font-medium transition-all",
-                      participants.includes(m.email) ? "border-indigo-600 bg-indigo-600 text-white shadow-sm" : "border-gray-200 bg-white text-gray-500 hover:border-indigo-200 hover:bg-indigo-50"
+                      participants.includes(m.email) ? "border-rose-400 bg-rose-400 text-white shadow-sm" : "border-gray-200 bg-white text-gray-500 hover:border-rose-200 hover:bg-rose-50"
                     )}>{m.name}</button>
                 ))}
               </div>
@@ -313,7 +313,7 @@ export function MeetingsContent({ embedded }: { embedded?: boolean }) {
                   {members.map((m) => (
                     <button key={m.email} type="button" onClick={() => toggleParticipant(m.email, editParticipants, setEditParticipants)}
                       className={cn("rounded-full border px-3 py-1 text-xs font-medium transition-all",
-                        editParticipants.includes(m.email) ? "border-indigo-600 bg-indigo-600 text-white" : "border-gray-200 text-gray-500 hover:bg-indigo-50"
+                        editParticipants.includes(m.email) ? "border-rose-400 bg-rose-400 text-white" : "border-gray-200 text-gray-500 hover:bg-rose-50"
                       )}>{m.name}</button>
                   ))}
                 </div>
@@ -322,7 +322,7 @@ export function MeetingsContent({ embedded }: { embedded?: boolean }) {
                   <Users className="h-4 w-4 text-gray-400" />
                   <div className="flex flex-wrap gap-1.5">
                     {detailMeeting.participants.split(",").filter(Boolean).map((p) => (
-                      <span key={p} className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-600">{getMemberName(p)}</span>
+                      <span key={p} className="rounded-full bg-rose-50 px-2 py-0.5 text-xs font-medium text-rose-500">{getMemberName(p)}</span>
                     ))}
                   </div>
                 </div>
@@ -350,9 +350,9 @@ export function MeetingsContent({ embedded }: { embedded?: boolean }) {
                 </div>
 
                 {/* 회의록 */}
-                <div className="rounded-xl bg-indigo-50/50 p-4">
+                <div className="rounded-xl bg-rose-50/50 p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="h-2.5 w-2.5 rounded-full bg-indigo-500" />
+                    <div className="h-2.5 w-2.5 rounded-full bg-rose-500" />
                     <span className="text-sm font-bold text-gray-800">회의록</span>
                   </div>
                   {isEditing ? (

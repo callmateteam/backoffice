@@ -10,18 +10,18 @@ export default function LoginPage() {
   if (session) redirect("/");
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-indigo-50 via-white to-violet-50">
+    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-rose-50 via-white to-fuchsia-50">
       <div className="w-full max-w-sm px-4">
-        <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-xl shadow-indigo-100/50">
+        <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-xl shadow-rose-100/50">
           <div className="flex flex-col items-center text-center">
-            <img src="/logo.png" alt="백오피스" className="h-14 w-14 rounded-2xl object-contain shadow-lg shadow-indigo-200" />
+            <img src="/logo.png" alt="백오피스" className="h-14 w-14 rounded-2xl object-contain shadow-lg shadow-rose-200" />
             <h1 className="mt-5 text-2xl font-bold text-gray-900">백오피스</h1>
             <p className="mt-2 text-sm text-gray-500">
               일정관리 시스템에 로그인하세요
             </p>
           </div>
           <Button
-            className="mt-8 w-full rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 py-5 text-sm font-semibold shadow-md shadow-indigo-200 transition-all hover:from-indigo-700 hover:to-violet-700 hover:shadow-lg hover:shadow-indigo-200"
+            className="mt-8 w-full rounded-xl bg-linear-to-r from-rose-400 to-fuchsia-400 py-5 text-sm font-semibold shadow-md shadow-rose-200 transition-all hover:from-rose-500 hover:to-fuchsia-500 hover:shadow-lg hover:shadow-rose-200"
             onClick={() => signIn("google", { callbackUrl: "/" })}
           >
             <svg className="mr-2.5 h-5 w-5" viewBox="0 0 24 24">

@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 
 const COLUMNS: { id: ScheduleStatus; label: string; color: string; headerColor: string; count: string }[] = [
   { id: "todo", label: "할 일", color: "bg-gray-50/80", headerColor: "bg-gray-200", count: "text-gray-600" },
-  { id: "in-progress", label: "진행 중", color: "bg-blue-50/50", headerColor: "bg-blue-500", count: "text-blue-600" },
+  { id: "in-progress", label: "진행 중", color: "bg-fuchsia-50/50", headerColor: "bg-fuchsia-400", count: "text-fuchsia-600" },
   { id: "done", label: "완료", color: "bg-emerald-50/50", headerColor: "bg-emerald-500", count: "text-emerald-600" },
 ];
 
@@ -57,7 +57,7 @@ function ScheduleCard({
             <div className="mt-2 flex flex-wrap gap-1">
               {schedule.assignee.split(",").filter(Boolean).map((a) => (
                 <div key={a} className="flex items-center gap-1">
-                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-linear-to-br from-indigo-400 to-violet-400 text-[10px] font-medium text-white">
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-linear-to-br from-rose-300 to-fuchsia-300 text-[10px] font-medium text-white">
                     {getMemberName(a)[0]}
                   </div>
                   <span className="text-xs text-gray-400">{getMemberName(a)}</span>
@@ -127,7 +127,7 @@ export function BoardView() {
 
       <div className="flex justify-end">
         <Button
-          className="rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-violet-700"
+          className="rounded-xl bg-linear-to-r from-rose-400 to-fuchsia-400 shadow-md shadow-rose-200 hover:from-rose-500 hover:to-fuchsia-500"
           onClick={() => {
             setSelectedSchedule(null);
             setFormOpen(true);

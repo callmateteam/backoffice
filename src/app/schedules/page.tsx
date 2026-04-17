@@ -54,7 +54,7 @@ function SchedulesContent() {
                   className={cn(
                     "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all",
                     view === option.value
-                      ? "bg-indigo-50 text-indigo-700 shadow-sm"
+                      ? "bg-rose-50 text-rose-600 shadow-sm"
                       : "text-gray-500 hover:text-gray-700"
                   )}
                 >

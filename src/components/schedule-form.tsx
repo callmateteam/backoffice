@@ -202,8 +202,8 @@ export function ScheduleForm({
                   className={cn(
                     "rounded-full border px-4 py-1.5 text-sm font-medium transition-all",
                     status === s.value
-                      ? "border-indigo-600 bg-indigo-600 text-white shadow-sm shadow-indigo-200"
-                      : "border-gray-200 bg-white text-gray-500 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
+                      ? "border-rose-400 bg-rose-400 text-white shadow-sm shadow-rose-200"
+                      : "border-gray-200 bg-white text-gray-500 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-500"
                   )}
                 >
                   {s.label}
@@ -243,8 +243,8 @@ export function ScheduleForm({
                   className={cn(
                     "rounded-full border px-3 py-1.5 text-sm font-medium transition-all",
                     assignees.includes(m.email)
-                      ? "border-indigo-600 bg-indigo-600 text-white shadow-sm shadow-indigo-200"
-                      : "border-gray-200 bg-white text-gray-500 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
+                      ? "border-rose-400 bg-rose-400 text-white shadow-sm shadow-rose-200"
+                      : "border-gray-200 bg-white text-gray-500 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-500"
                   )}
                 >
                   {m.name}

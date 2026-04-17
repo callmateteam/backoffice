@@ -47,10 +47,10 @@ export default function DashboardPage() {
     .slice(0, 5);
 
   const stats = [
-    { label: "전체 일정", value: schedules.length, icon: CalendarDays, color: "from-indigo-500 to-indigo-600", bg: "bg-indigo-50", text: "text-indigo-600" },
-    { label: "할 일", value: todoCount, icon: ListTodo, color: "from-amber-500 to-orange-500", bg: "bg-amber-50", text: "text-amber-600" },
-    { label: "진행 중", value: inProgressCount, icon: Clock, color: "from-blue-500 to-cyan-500", bg: "bg-blue-50", text: "text-blue-600" },
-    { label: "완료", value: doneCount, icon: CheckCircle2, color: "from-emerald-500 to-green-500", bg: "bg-emerald-50", text: "text-emerald-600" },
+    { label: "전체 일정", value: schedules.length, icon: CalendarDays, color: "from-rose-400 to-fuchsia-400", bg: "bg-rose-50", text: "text-rose-500" },
+    { label: "할 일", value: todoCount, icon: ListTodo, color: "from-amber-400 to-amber-500", bg: "bg-amber-50", text: "text-amber-600" },
+    { label: "진행 중", value: inProgressCount, icon: Clock, color: "from-fuchsia-400 to-fuchsia-500", bg: "bg-fuchsia-50", text: "text-fuchsia-600" },
+    { label: "완료", value: doneCount, icon: CheckCircle2, color: "from-emerald-400 to-emerald-500", bg: "bg-emerald-50", text: "text-emerald-600" },
   ];
 
   return (
@@ -95,7 +95,7 @@ export default function DashboardPage() {
               <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
                 <div className="flex items-center justify-between border-b border-gray-50 px-6 py-4">
                   <h2 className="font-semibold text-gray-900">오늘 일정</h2>
-                  <Link href="/calendar" className="flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700">
+                  <Link href="/calendar" className="flex items-center gap-1 text-xs font-medium text-rose-500 hover:text-rose-600">
                     전체보기 <ArrowRight className="h-3 w-3" />
                   </Link>
                 </div>
@@ -120,7 +120,7 @@ export default function DashboardPage() {
                           <span className={cn(
                             "rounded-full px-2.5 py-0.5 text-xs font-medium",
                             s.status === "done" ? "bg-emerald-50 text-emerald-600" :
-                            s.status === "in-progress" ? "bg-blue-50 text-blue-600" :
+                            s.status === "in-progress" ? "bg-fuchsia-50 text-fuchsia-600" :
                             "bg-gray-100 text-gray-500"
                           )}>
                             {STATUS_LABELS[s.status]}
@@ -135,7 +135,7 @@ export default function DashboardPage() {
               <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
                 <div className="flex items-center justify-between border-b border-gray-50 px-6 py-4">
                   <h2 className="font-semibold text-gray-900">다가오는 일정</h2>
-                  <Link href="/list" className="flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700">
+                  <Link href="/list" className="flex items-center gap-1 text-xs font-medium text-rose-500 hover:text-rose-600">
                     전체보기 <ArrowRight className="h-3 w-3" />
                   </Link>
                 </div>

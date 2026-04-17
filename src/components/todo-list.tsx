@@ -61,7 +61,7 @@ export function TodoList({ scheduleId }: TodoListProps) {
         {total > 0 && (
           <div className="h-2 w-24 overflow-hidden rounded-full bg-gray-200">
             <div
-              className="h-full rounded-full bg-linear-to-r from-indigo-500 to-violet-500 transition-all"
+              className="h-full rounded-full bg-linear-to-r from-rose-400 to-fuchsia-400 transition-all"
               style={{ width: `${total > 0 ? (completed / total) * 100 : 0}%` }}
             />
           </div>
@@ -98,7 +98,7 @@ export function TodoList({ scheduleId }: TodoListProps) {
                   href={todo.link.startsWith("http") ? todo.link : `https://${todo.link}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-md p-1 text-indigo-500 transition-colors hover:bg-indigo-50 hover:text-indigo-700"
+                  className="rounded-md p-1 text-rose-500 transition-colors hover:bg-rose-50 hover:text-rose-600"
                   title={todo.link}
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -106,7 +106,7 @@ export function TodoList({ scheduleId }: TodoListProps) {
                 </a>
               )}
               {todo.assignee && (
-                <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-[11px] font-medium text-indigo-600">
+                <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[11px] font-medium text-rose-500">
                   {getMemberName(todo.assignee)}
                 </span>
               )}
@@ -134,7 +134,7 @@ export function TodoList({ scheduleId }: TodoListProps) {
           <select
             value={newAssignee}
             onChange={(e) => setNewAssignee(e.target.value)}
-            className="h-8 rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-600 outline-none focus:border-indigo-400"
+            className="h-8 rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-600 outline-none focus:border-rose-300"
           >
             <option value="">담당자</option>
             {members.map((m) => (
@@ -147,7 +147,7 @@ export function TodoList({ scheduleId }: TodoListProps) {
             size="sm"
             variant="ghost"
             onClick={() => setShowLinkInput(!showLinkInput)}
-            className={cn("h-8 w-8 p-0", showLinkInput && "text-indigo-600")}
+            className={cn("h-8 w-8 p-0", showLinkInput && "text-rose-500")}
             title="링크 추가"
           >
             <LinkIcon className="h-3.5 w-3.5" />
