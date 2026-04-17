@@ -340,6 +340,26 @@ export async function publishApproved(): Promise<{ published: number }> {
       if (!createRes.ok) throw new Error(await createRes.text());
       const { id: containerId } = await createRes.json();
 
+      // 컨테이너 처리 완료 대기 (최대 30초)
+      let status = "IN_PROGRESS";
+      for (let i = 0; i < 10; i++) {
+        await new Promise((r) => setTimeout(r, 3000));
+        const sRes = await fetch(
+          `${BASE_URL}/${containerId}?fields=status&access_token=${env.accessToken}`
+        );
+        if (sRes.ok) {
+          const s = await sRes.json();
+          status = s.status;
+          if (status === "FINISHED") break;
+          if (status === "ERROR" || status === "EXPIRED") {
+            throw new Error(`Container status: ${status}`);
+          }
+        }
+      }
+      if (status !== "FINISHED") {
+        throw new Error(`Container not ready after 30s`);
+      }
+
       // Publish container
       const pubRes = await fetch(`${BASE_URL}/${env.userId}/threads_publish`, {
         method: "POST",
@@ -578,6 +598,26 @@ export async function publishReply(replyPageId: string, replyText: string, reply
   });
   if (!createRes.ok) throw new Error(await createRes.text());
   const { id: containerId } = await createRes.json();
+
+  // 컨테이너 상태 폴링 (최대 30초)
+  let status = "IN_PROGRESS";
+  for (let i = 0; i < 10; i++) {
+    await new Promise((r) => setTimeout(r, 3000));
+    const statusRes = await fetch(
+      `${BASE_URL}/${containerId}?fields=status&access_token=${env.accessToken}`
+    );
+    if (statusRes.ok) {
+      const s = await statusRes.json();
+      status = s.status;
+      if (status === "FINISHED") break;
+      if (status === "ERROR" || status === "EXPIRED") {
+        throw new Error(`Container status: ${status}`);
+      }
+    }
+  }
+  if (status !== "FINISHED") {
+    throw new Error(`Container not ready after 30s. Status: ${status}`);
+  }
 
   // Publish
   const pubRes = await fetch(`${BASE_URL}/${env.userId}/threads_publish`, {
