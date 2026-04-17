@@ -53,6 +53,26 @@ export async function POST(request: NextRequest) {
     if (!createRes.ok) throw new Error(await createRes.text());
     const { id: containerId } = await createRes.json();
 
+    // 3.5 컨테이너 처리 상태 확인 (최대 30초 폴링)
+    let status = "IN_PROGRESS";
+    for (let i = 0; i < 10; i++) {
+      await new Promise((r) => setTimeout(r, 3000));
+      const statusRes = await fetch(
+        `${THREADS_API}/${containerId}?fields=status&access_token=${THREADS_ACCESS_TOKEN}`
+      );
+      if (statusRes.ok) {
+        const s = await statusRes.json();
+        status = s.status;
+        if (status === "FINISHED") break;
+        if (status === "ERROR" || status === "EXPIRED") {
+          throw new Error(`Container status: ${status}`);
+        }
+      }
+    }
+    if (status !== "FINISHED") {
+      throw new Error(`Container not ready after 30s. Status: ${status}`);
+    }
+
     // 4. Publish
     const pubRes = await fetch(`${THREADS_API}/${THREADS_USER_ID}/threads_publish`, {
       method: "POST",
