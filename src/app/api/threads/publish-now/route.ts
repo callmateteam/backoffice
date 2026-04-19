@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     const page = await pageRes.json();
 
     const content = page.properties["본문"]?.rich_text?.[0]?.plain_text ?? "";
-    const title = page.properties["제목"]?.title?.[0]?.plain_text ?? "";
+    const comment = page.properties["댓글"]?.rich_text?.[0]?.plain_text ?? "";
     const type = page.properties["유형"]?.select?.name ?? "";
 
     if (!content) throw new Error("No content");
@@ -84,6 +84,51 @@ export async function POST(request: NextRequest) {
     });
     if (!pubRes.ok) throw new Error(await pubRes.text());
     const { id: postId } = await pubRes.json();
+
+    // 4.5 댓글(1번 스레드) 이어서 발행
+    if (comment && comment.trim()) {
+      try {
+        const replyCreateRes = await fetch(`${THREADS_API}/${THREADS_USER_ID}/threads`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            media_type: "TEXT",
+            text: comment.trim(),
+            reply_to_id: postId,
+            access_token: THREADS_ACCESS_TOKEN,
+          }),
+        });
+        if (replyCreateRes.ok) {
+          const { id: replyContainerId } = await replyCreateRes.json();
+          // 컨테이너 폴링
+          let rStatus = "IN_PROGRESS";
+          for (let i = 0; i < 10; i++) {
+            await new Promise((r) => setTimeout(r, 3000));
+            const sRes = await fetch(
+              `${THREADS_API}/${replyContainerId}?fields=status&access_token=${THREADS_ACCESS_TOKEN}`
+            );
+            if (sRes.ok) {
+              const s = await sRes.json();
+              rStatus = s.status;
+              if (rStatus === "FINISHED") break;
+              if (rStatus === "ERROR" || rStatus === "EXPIRED") break;
+            }
+          }
+          if (rStatus === "FINISHED") {
+            await fetch(`${THREADS_API}/${THREADS_USER_ID}/threads_publish`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                creation_id: replyContainerId,
+                access_token: THREADS_ACCESS_TOKEN,
+              }),
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Comment publish failed:", err);
+      }
+    }
 
     // 5. Get permalink
     const linkRes = await fetch(

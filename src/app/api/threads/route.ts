@@ -31,6 +31,7 @@ export async function GET() {
       id: page.id,
       title: p["제목"]?.title?.[0]?.plain_text ?? "",
       content: p["본문"]?.rich_text?.[0]?.plain_text ?? "",
+      comment: p["댓글"]?.rich_text?.[0]?.plain_text ?? "",
       type: p["유형"]?.select?.name ?? "",
       status: p["상태"]?.select?.name ?? "",
       scheduledAt: p["예약시간"]?.date?.start ?? null,
@@ -62,6 +63,7 @@ export async function POST(request: NextRequest) {
       properties: {
         제목: { title: [{ text: { content: body.title || "" } }] },
         본문: { rich_text: [{ text: { content: body.content || "" } }] },
+        댓글: { rich_text: [{ text: { content: body.comment || "" } }] },
         유형: { select: { name: body.type || "공감형" } },
         상태: { select: { name: "초안" } },
       },

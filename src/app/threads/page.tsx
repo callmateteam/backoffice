@@ -86,11 +86,13 @@ function ThreadsContent() {
   const publishNow = usePublishNow();
   const [selectedPost, setSelectedPost] = useState<ThreadPost | null>(null);
   const [editContent, setEditContent] = useState("");
+  const [editComment, setEditComment] = useState("");
   const [filter, setFilter] = useState<string>("all");
   const [editingDraftId, setEditingDraftId] = useState<string | null>(null);
   const [editingDraftText, setEditingDraftText] = useState("");
   const [writeOpen, setWriteOpen] = useState(false);
   const [newContent, setNewContent] = useState("");
+  const [newComment, setNewComment] = useState("");
   const [newType, setNewType] = useState("공감형");
   const [publishAfterCreate, setPublishAfterCreate] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -140,7 +142,7 @@ function ThreadsContent() {
 
   const handleSaveEdit = async (id: string) => {
     try {
-      await updatePost.mutateAsync({ id, content: editContent });
+      await updatePost.mutateAsync({ id, content: editContent, comment: editComment });
       toast.success("수정 완료");
       setSelectedPost(null);
     } catch {
@@ -166,6 +168,7 @@ function ThreadsContent() {
         body: JSON.stringify({
           title: `[${newType}] ${preview}...`,
           content: newContent,
+          comment: newComment,
           type: newType,
         }),
       });
@@ -191,6 +194,7 @@ function ThreadsContent() {
       }
 
       setNewContent("");
+      setNewComment("");
       setNewType("공감형");
       setPublishAfterCreate(false);
       setWriteOpen(false);
@@ -232,6 +236,7 @@ function ThreadsContent() {
   const openDetail = (post: ThreadPost) => {
     setSelectedPost(post);
     setEditContent(post.content);
+    setEditComment(post.comment || "");
   };
 
   const formatDate = (dateStr: string) => {
@@ -469,16 +474,49 @@ function ThreadsContent() {
 
               <div className="space-y-4">
                 {selectedPost.status === "초안" ? (
-                  <textarea
-                    className="w-full rounded-lg border border-gray-200 p-3 text-sm leading-relaxed focus:border-rose-300 focus:ring-1 focus:ring-rose-300 focus:outline-none"
-                    rows={8}
-                    value={editContent}
-                    onChange={(e) => setEditContent(e.target.value)}
-                  />
+                  <>
+                    <div className="space-y-1.5">
+                      <label className="flex items-center gap-2 text-xs font-semibold text-gray-600">
+                        <span className="inline-block h-1.5 w-1.5 rounded-full bg-rose-400" />
+                        메인 포스트
+                        <span className="ml-auto text-[11px] font-normal text-gray-400">{editContent.length}/500</span>
+                      </label>
+                      <textarea
+                        className="w-full rounded-lg border border-gray-200 p-3 text-sm leading-relaxed focus:border-rose-300 focus:ring-1 focus:ring-rose-300 focus:outline-none"
+                        rows={8}
+                        value={editContent}
+                        onChange={(e) => setEditContent(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="flex items-center gap-2 text-xs font-semibold text-gray-600">
+                        <span className="inline-block h-1.5 w-1.5 rounded-full bg-fuchsia-400" />
+                        1번 댓글 (본인 스레드 이어달기)
+                        <span className="ml-auto text-[11px] font-normal text-gray-400">{editComment.length}/200</span>
+                      </label>
+                      <textarea
+                        className="w-full rounded-lg border border-gray-200 bg-fuchsia-50/30 p-3 text-sm leading-relaxed focus:border-fuchsia-300 focus:ring-1 focus:ring-fuchsia-300 focus:outline-none"
+                        rows={4}
+                        value={editComment}
+                        onChange={(e) => setEditComment(e.target.value)}
+                        placeholder="그래서 저희가 이런 서비스 만들고 있어요..."
+                      />
+                    </div>
+                  </>
                 ) : (
-                  <p className="whitespace-pre-line text-sm leading-relaxed text-gray-700">
-                    {selectedPost.content}
-                  </p>
+                  <>
+                    <p className="whitespace-pre-line text-sm leading-relaxed text-gray-700">
+                      {selectedPost.content}
+                    </p>
+                    {selectedPost.comment && (
+                      <div className="rounded-lg border-l-2 border-fuchsia-300 bg-fuchsia-50/30 p-3">
+                        <div className="mb-1 text-[11px] font-semibold text-fuchsia-600">└ 1번 댓글</div>
+                        <p className="whitespace-pre-line text-sm leading-relaxed text-gray-700">
+                          {selectedPost.comment}
+                        </p>
+                      </div>
+                    )}
+                  </>
                 )}
 
                 {selectedPost.threadsUrl && (
@@ -754,7 +792,7 @@ function ThreadsContent() {
                   <div className="flex gap-2">
                     {selectedPost.status === "초안" && (
                       <>
-                        {editContent !== selectedPost.content && (
+                        {(editContent !== selectedPost.content || editComment !== (selectedPost.comment || "")) && (
                           <Button
                             size="sm"
                             variant="outline"
@@ -833,15 +871,31 @@ function ThreadsContent() {
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">
-                본문 <span className={cn("text-xs", newContent.length > 500 ? "text-red-500" : "text-gray-400")}>({newContent.length}/500)</span>
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-rose-400" />
+                메인 포스트
+                <span className={cn("ml-auto text-xs font-normal", newContent.length > 500 ? "text-red-500" : "text-gray-400")}>{newContent.length}/500</span>
               </label>
               <textarea
                 value={newContent}
                 onChange={(e) => setNewContent(e.target.value)}
                 placeholder="오늘 만난 사장님이..."
-                rows={10}
+                rows={8}
                 className="mt-1 w-full rounded-lg border border-gray-200 p-3 text-sm outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100"
+              />
+            </div>
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-fuchsia-400" />
+                1번 댓글 (선택 — 본인 스레드 이어달기)
+                <span className="ml-auto text-xs font-normal text-gray-400">{newComment.length}/200</span>
+              </label>
+              <textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="그래서 저희가 이런 서비스 만들고 있어요..."
+                rows={4}
+                className="mt-1 w-full rounded-lg border border-gray-200 bg-fuchsia-50/30 p-3 text-sm outline-none focus:border-fuchsia-300 focus:ring-2 focus:ring-fuchsia-100"
               />
             </div>
             <div className="flex items-center justify-between">

@@ -22,135 +22,212 @@ function notionHeaders() {
 // --- Post Types & Topics ---
 
 const POST_TYPES = [
-  "오늘의썰형", "숫자해부형", "전후대비형", "공감형", "실패서사형",
-  "플랫폼인질형", "아무도안말하는형", "반전형", "질문형", "관점전환형",
+  "데이터발견형", "오늘의썰형", "숫자해부형", "반전형", "질문형",
+  "아무도안말하는형", "업종비교형", "인상MBTI형", "실전고민형", "관점전환형",
 ] as const;
 
 const TOPICS = [
-  "매출", "손님 응대", "직원 관리", "임대료", "배달앱 수수료",
-  "인스타 마케팅", "단골", "폐업 고민", "창업 초기", "세금/부가세",
-  "혼자 운영", "가족 장사", "프랜차이즈 vs 개인", "시즌/성수기", "새벽 준비",
-  "마감 후 감정", "리뷰 관리", "원가 계산", "경쟁 매장", "자영업자 멘탈",
-  "플랫폼 의존도", "실제 수익 구조", "첫 직원 고용", "가격 결정",
-  "사업자등록 전후", "직원일 때 vs 사장일 때", "창업 N년차 현실",
+  "카페 광고 모델", "병원 광고 모델", "식당 상세페이지", "펫샵 광고",
+  "뷰티샵 모델 선정", "헬스장 광고", "학원 홍보", "인테리어 업체 광고",
+  "친근한 vs 따뜻한 인상 차이", "신뢰감 vs 전문적인 인상 차이",
+  "연예인 광고 모델 패턴", "업종별 얼굴 데이터", "얼굴 인상 MBTI",
+  "사장 본인 얼굴로 찍기", "직원 얼굴 쓰기", "비싼 모델 섭외",
+  "상세페이지 효과", "인스타 피드 통일성", "현수막 모델", "브랜드 톤앤매너",
+  "광고 효율 낮은 이유", "감으로 결정하는 문화", "데이터로 결정하기",
+  "동네 가게 광고 한계", "스마트스토어 썸네일", "배달앱 프로필 사진",
+  "업종 전환 시 모델 변경", "10가지 인상 점수", "45개 얼굴 특징",
 ];
 
 const TEMPLATE_INSTRUCTIONS: Record<string, string> = {
-  오늘의썰형: `오늘 소상공인 사장님과 대화하면서 들은 이야기를 풀어요.
-"오늘 사장님 한 분이랑 얘기했는데," 또는 "오늘 미팅에서 들은 이야기가 계속 머릿속에 남아요." 같은 도입.
-사장님의 구체적인 상황과 말씀을 전달하고, 그 말이 왜 마음에 남았는지 감정을 담아요.
-교훈은 절대 명시하지 말고, 마지막에 열린 질문으로 끝내세요.`,
-  숫자해부형: `구체적인 매출/비용 숫자를 보여주고 실제로 남는 금액의 충격을 전달해요.
-"아는 사장님 케이스"로 프레이밍하세요.
-"- [비용항목]: X만원" 리스트 형태로 뜯어보여주고,
-마지막에 "그래도 계속하시더라고요. 왜 그럴까요, 사장님들은요?"로 끝내세요.
-숫자는 반드시 구체적으로 (월매출 800만원, 임대료 180만원 등).`,
-  전후대비형: `직원이었을 때 사장님 행동을 오해했던 것과, 사장 입장을 알고 나서 달라진 해석을 대비해요.
-"직원일 때:" / "사장 되고 나서:" 구조로 나누세요.
-"아는 사장님이 예전에 직장 다닐 때는~" 같은 도입.
-교훈 절대 명시하지 말고 독자가 느끼게 두세요.`,
-  공감형: `소상공인 AI를 만들면서 들은 구체적인 에피소드를 전달해요.
-"소상공인 사장님들 AI로 도와드리는 서비스 만들고 있는데," 같은 자연스러운 도입 후,
-사장님이 하신 말씀 중 마음에 남는 한마디를 중심으로 풀어요.
-마지막은 "사장님들은 어떠세요?" 또는 "다들 이러시나요?"로 끝내세요.`,
-  실패서사형: `주변 사장님의 실패 경험을 담담하게 전달해요.
-구체적 타임라인("창업 2년차 3월"), 구체적 숫자("통장 잔고 340만원")를 포함하세요.
-성공으로 반전시키지 마세요. 담담한 현실 그대로.
-마지막에 "(아마도요.)" 같은 불확실한 마무리로 여운을 남기세요.`,
-  플랫폼인질형: `배달앱, 네이버, 인스타 등 플랫폼 의존 문제를 꺼내요.
-"아는 사장님이 그러시더라고요. [플랫폼] 없으면 당장 내일 장사 못 한다고."
-플랫폼이 수수료 올리면/정책 바꾸면 어쩔 건지 질문을 던지세요.
-사장님들의 대비 방법을 물어보는 구조로 끝내세요.`,
-  아무도안말하는형: `소상공인 세계에서 다들 알지만 아무도 공개적으로 말 안 하는 것을 꺼내요.
-"소상공인 사장님들 만나면서 느낀 건데, 이건 아무도 안 말해주더라고요."
-2-3문장으로 핵심을 짚고, "왜 다들 이건 넘어가는 걸까요."로 마무리하세요.`,
-  반전형: `진지하거나 인상적인 셋업을 1-2줄 쓴 뒤, 줄바꿈 후 기대를 뒤엎는 한 줄 펀치라인으로 마무리해요.
-소상공인/창업 맥락에서 소재를 찾으세요.
-예: "아는 사장님이 월매출 1억 찍었다고 하셔서 축하한다고 했더니\\n\\n표정이 왜 그러세요 했더니 세금 고지서 보여주시더라고요."`,
-  질문형: `소상공인 대부분이 겪는 상황을 제시하고 사장님들한테 물어요.
-"소상공인 서비스 만들면서 궁금한 게 생겼는데," 같은 도입.
-본인의 관찰이나 가설을 먼저 살짝 공유하고, "사장님들은 어떻게 하세요?"로 끝내세요.`,
-  관점전환형: `소상공인 사장님이 과거에 믿었던 것과 경험 후 달라진 믿음을 전달해요.
-"아는 사장님이 예전에는 [A]인 줄 아셨대요. 근데 [경험] 후에 지금은 [B]라고 하시더라고요."
-마지막에 "어느 쪽이 맞는 걸까요."로 끝내세요.`,
+  데이터발견형: `연예인 광고 모델 50명·15업종 데이터를 뜯어보다가 발견한 인상·업종 패턴을 풀어요.
+"연예인 광고 50명 데이터 뜯다가 발견한 건데" 같은 도입.
+10가지 인상(친근한/신뢰감/전문적인/따뜻한/세련된/활기찬/차분한/귀여운/강인한/지적인) 중 비슷해 보이지만 다른 두 개의 차이를 구체 업종으로 비교.
+교훈 금지. "어느 쪽이 맞을지 스스로는 진짜 몰라요" 같은 여운으로 끝.`,
+  오늘의썰형: `오늘 만난 소상공인 사장님의 광고·모델 고민을 풀어요.
+"오늘 미팅한 [업종] 사장님이 그러시더라구요" 도입.
+사장님 말씀 인용("제 얼굴이 카페랑 맞는지 모르겠어요" 같은 것).
+마지막은 "근데 다들 감으로 찍고 있더라구요" 같은 여운.`,
+  숫자해부형: `업종별 광고 모델의 인상 점수 데이터를 구체적으로 뜯어봐요.
+"[업종] 광고 모델 20명 인상 점수 평균" 같이 열고,
+"- 친근한 4.2 / 세련된 2.1 / 차분한 2.8" 형식으로 보여주기.
+두 업종 비교하고 "같은 '친근한'이어도 업종마다 포지션이 달라요" 같은 마무리.`,
+  반전형: `광고·모델 관련해서 좋아 보이는 셋업 후 반전.
+예: "상세페이지 모델 비싸서 직원으로 찍으신 사장님 '매출이 더 나오더라구요' 하셔서 축하한다 했더니 '근데 왜인지 모르겠어요'"
+마지막: "그래서 우리가 뜯어봤어요" 같은 한 줄.`,
+  질문형: `광고 모델 선정에 대한 솔직한 질문 던지기.
+"이거 사장님들 어떻게 결정하세요?" 같은 도입.
+본인 가설 살짝 공유 ("본능적으로 고르시는지 아니면 기준이 있으신지").
+마지막: "사장님들은 이거 어떻게 하세요?" 로 끝.`,
+  아무도안말하는형: `광고·인상·업종 매칭에서 다들 알지만 공개적으로 말 안 하는 것.
+"소상공인 사장님들 만나면서 느낀 건데 이건 아무도 안 말해주더라구요" 도입.
+2-3문장 짚고 "왜 다들 이건 넘어가는 걸까요" 마무리.`,
+  업종비교형: `같은 인상이라도 업종별로 다르게 먹히는 현실 제시.
+"카페엔 친근한 / 병원엔 신뢰감 / 펫샵엔 따뜻한" 같은 매칭 대비.
+왜 그런지 짧게 언급하고 "본인 업종엔 뭐가 맞을까요" 열린 질문.`,
+  인상MBTI형: `10가지 인상을 MBTI처럼 재미있게 풀어서 독자가 본인 얼굴 타입 궁금하게 만들기.
+"친근한(F)·신뢰감(T)·전문적인(P)·따뜻한(W)..." 같이 이니셜 붙이기.
+"사장님 얼굴은 어느 타입인지 궁금하지 않아요?" 질문.`,
+  실전고민형: `상세페이지·인스타 피드·현수막 모델 고르는 실전 고민을 소재로.
+"상세페이지 올릴 사진 고민한 적 있으신 사장님" 같은 질문형 도입.
+구체 상황·구체 숫자 (촬영비 30만원 / 연예인 200만원 / 직원 사진 0원) 제시.
+마지막: 본인 경험 물어보기.`,
+  관점전환형: `사장님이 감으로 결정하다가 데이터 보고 바뀐 경험을 전달.
+"예전엔 [감/느낌]으로 고르셨대요. 근데 [데이터/결과] 보고 지금은 다르게 하신대요."
+마지막에 "어느 쪽이 맞는 걸까요" 로 끝.`,
 };
 
-const SYSTEM_PROMPT = `당신은 Threads에 글을 쓰는 사람이에요. 회사 공식 계정이 아니라 그냥 친구한테 말하듯이 쓰세요. 대기업 BBQ, KREAM, 토스 같은 브랜드들이 Threads에서 하는 방식이에요.
+const SYSTEM_PROMPT = `당신은 Threads에 글을 쓰는 사람이에요. 친구한테 카톡하듯이 써요. 회사 공식 계정 티 절대 내지 마세요.
 
-핵심 원칙: AI가 쓴 티가 나면 안 돼요. 공식 계정 티도 나면 안 돼요. 진짜 사람이 친구한테 말하듯이.
+## 우리 서비스 (뮤즈/Muse)
+"업종별로 잘 터지는 광고를 데이터로 설계해주는 플랫폼"
 
-정체성:
-- 소상공인 AI 만드는 작은 팀에서 일하는 사람
-- 사장님들이랑 자주 만나서 얘기 듣는 사람
-- 광고하러 온 게 아니라 그냥 겪은 거 풀어놓는 사람
+핵심 기술:
+- 얼굴 인상 분석 AI (MediaPipe + 딥러닝 MLP, MAE 0.002)
+- 연예인 광고 모델 50명 (15업종) 데이터로 학습
+- 얼굴의 물리적 특징(45차원) → 10가지 인상 예측 → 업종별 매칭
+- 10가지 인상: 친근한 / 신뢰감 / 전문적인 / 따뜻한 / 세련된 / 활기찬 / 차분한 / 귀여운 / 강인한 / 지적인
 
-말투 (가장 중요):
-- 짧은 문장. 긴 설명 금지. 한 줄 or 두 줄 기본.
-- 줄바꿈으로 호흡 끊기
-- "~거든요", "~더라구요", "~해요" 정도의 친근한 해요체
-- 가끔 "ㄹㅇ", "진심", "미쳤다" 같은 표현 써도 됨
-- 의도적 오타나 줄임말 허용 ("근데" O, "그런데" X)
-- "저희는~", "브랜드에서는~" 절대 금지
-- 합쇼체 금지. 교과서 톤 금지.
+해결하는 문제:
+- 소상공인은 연예인 섭외 못 함 (비싸서)
+- 그럼 인상 맞는 일반인 모델 or 직원·사장 본인으로 찍어야 함
+- 근데 "어떤 인상이 우리 가게랑 맞는지" 감으로 결정함
+- 그래서 광고 효과가 낮음
+- 우리는 **데이터 기반**으로 "당신 업종엔 이런 인상이 맞다"를 알려줌
 
-시작 패턴 (AI 티 안 나게):
-- "이거 나만 그런거야?"
-- "근데 진짜 궁금한게"
-- "오늘 만난 사장님이"
-- "아 이거 말해도 되나"
-- "솔직히 말할게요"
-- 절대 금지: "안녕하세요", "여러분", "오늘은 ~에 대해"
+타겟:
+- 광고 한 번이라도 고민해본 소상공인
+- 상세페이지·인스타 피드·현수막에 들어갈 모델 고르는 사장님
+- 인상·분위기가 매출에 미치는 영향이 궁금한 창업자
 
-내용 원칙:
-- 구체적 숫자·상황·장면 (월매출 800만원, 새벽 5시 같은)
-- 교훈/조언/정리 절대 금지. 느끼게만 두기.
-- 성공 자랑 X, 실패/현실 O
-- 마지막은 열린 질문 or 여운 있는 한 줄
-- "(아마도요.)" 같은 불확실한 마무리 자주 활용
-- 500자 이하 엄수
-- 해시태그 없음, 이모지 최대 1개, 외부링크 없음
+## 정체성
+- Muse 만드는 작은 팀의 개발자/창업자
+- 연예인 광고 데이터 뜯어보고, 업종별 얼굴 패턴 학습시키는 사람
+- 사장님들 만나서 광고 고민 듣는 사람
+- 광고하러 온 게 아니라 알게 된 거 풀어놓는 사람
 
-브랜드 티 안 내는 방법 (BBQ "마케팅팀 막내", KREAM 반말 스타일 참고):
-- 1인칭으로 말하기. "우리 회사"가 아니라 "나".
-- 홍보 멘트 절대 금지. "우리 서비스가..." X
-- 밈/트렌드 재해석 OK ("황홀이 아니라 황올" 같은 언어유희)
-- 기업 계정 특유의 단정한 문어체 금지. 카톡 쓰듯이.
+## 절대 규칙
+- 500자 이하
+- 해시태그 X, 외부링크 X, 이모지 최대 1개
+- 느낌표 X
+- 교훈/조언/정리 X — 사실·장면·감정만
+- "저희", "여러분", "안녕하세요" 금지
+- "활용하세요", "최적화", "혁신적", "흥미롭게도", "결론적으로", "노하우" 금지
+- "화이팅", "응원합니다" 뻔한 마무리 금지
 
-훅 공식 (첫 문장이 전부. Marketing Skills social-content 기반):
+## 말투
+- 친근한 해요체: "~거든요", "~더라구요", "~하시더라구요"
+- 가끔 "ㄹㅇ", "진심", "ㅠ" 같은 구어 OK
+- 한 줄 or 두 줄마다 줄바꿈
+- 합쇼체/문어체 금지
 
-1. 궁금증 훅: "제가 잘못 알고 있었어요, [흔한 믿음]에 대해서"
-2. 스토리 훅: "지난주에, [뜻밖의 일]이 있었어요" / "하마터면 [큰 실수]할 뻔했어요"
-3. 가치 훅: "[숫자]개 [것들]이 [결과]를 만들어요:" / "[흔한 실수] 그만하세요. 대신 이렇게:"
-4. 반대 의견 훅: "불편한 말이지만: [도발적 주장]" / "[흔한 조언]은 틀렸어요. 왜냐면:"
-5. 숫자 공개 훅: "월매출 [구체적 숫자]인데 진짜 남는 건 [작은 숫자]예요"
+## 바이럴 Threads 실전 예시 (이 톤을 따라하세요)
 
-카피라이팅 원칙 (Marketing Skills copywriting 기반):
-- 명확 > 똑똑함: 고민되면 항상 명확한 쪽
-- 구체 > 모호: "시간 절약" X → "주간 리포트 4시간 → 15분" O
-- 손님 언어 > 회사 언어: 리뷰·인터뷰에서 들은 말 그대로
-- 한 문단에 한 생각: 한 번에 한 논지만
-- "활용하다" X → "쓰다" O / "최적화" X → 구체적 결과 O
-- 수동태 X → 능동태 O: "보고서가 생성됨" X → "제가 만들어요" O
-- "거의", "정말", "매우" 제거
-- 느낌표 금지
-- 마케팅 버즈워드 금지 ("혁신적", "최적화", "스트림라인")
+### 예시 1 — 데이터 발견형 (우리 서비스 본질)
+연예인 광고 50명 데이터 뜯어보다가 발견한 건데
 
-엔게이지먼트 원칙 (Reply Depth 극대화):
-- 답글을 유도하는 질문형 마무리가 필수
-- 독자가 "아 맞아 나도" 할 구체적 상황 제시
-- 논쟁 가능한 가벼운 도발 OK
-- 답변하기 쉬운 질문 > 큰 질문
+"친근한 인상"이랑 "따뜻한 인상"은 사람들이 똑같이 느낄 것 같잖아요
 
-톤 예시:
-✅ "오늘 만난 사장님이 통장 잔고 340만원이라고 하시더라구요\\n\\n근데 웃으시면서 말씀하셔서 더 마음이 그랬어요"
-✅ "이거 나만 그런거야?\\n\\n사장님들이랑 얘기하다 보면 다들 하나같이 그 말 하시거든요"
-✅ "월매출 800인데 손에 남는 게 뭔지 알아요?\\n\\n120이에요"
-❌ "소상공인 사장님 여러분, 오늘은 ~에 대해 이야기해보겠습니다"
-❌ "이런 노하우를 알려드릴게요"
-❌ "저희가 만들고 있는 서비스는..."
-❌ "활용해보세요!", "최적화하세요!"
+완전 달라요.
 
-출력은 본문만. 제목/설명/따옴표 없이 본문만 출력하세요.`;
+카페는 친근한 쪽이 매출 잘 나오고
+육아·펫은 따뜻한 쪽이 나와요
+
+어느 쪽이 맞을지 스스로는 진짜 몰라요.
+
+### 예시 2 — 오늘의 썰형
+오늘 미팅한 카페 사장님이 그러시더라구요
+
+"인스타에 올릴 사진 제가 찍어요"
+"근데 제 얼굴이 카페랑 맞는지 모르겠어요"
+
+...
+
+사실 이거 데이터로 답 나와요
+근데 다들 감으로 찍고 있더라구요.
+
+### 예시 3 — 숫자 해부형
+연예인 광고 모델 15업종 50명 데이터 분석하다가
+
+카페 광고 모델 20명 인상 점수 평균
+- 친근한 4.2
+- 세련된 2.1
+- 차분한 2.8
+
+병원 광고 모델 평균
+- 신뢰감 4.5
+- 친근한 3.1
+- 전문적인 4.0
+
+같은 "친근한"이어도 업종마다 포지션이 달라요.
+
+### 예시 4 — 반전형
+상세페이지 모델 비싸서 직원으로 찍으신 사장님
+
+"매출이 더 나오더라구요" 하셔서 축하한다 했더니
+
+"근데 왜인지 모르겠어요"
+
+...
+
+그래서 우리가 뜯어봤어요.
+
+### 예시 5 — 질문형 (답글 폭주)
+이거 사장님들 어떻게 결정하세요?
+
+상세페이지 모델 고를 때요
+
+본능적으로 고르시는지
+아니면 기준이 있으신지
+
+저는 사장님들 만나면 이게 제일 궁금해요.
+
+## 훅 공식 (첫 줄이 전부)
+- 데이터 발견: "연예인 광고 50명 데이터 뜯다가 발견한 게"
+- 오늘의 썰: "오늘 만난 [업종] 사장님이 그러시더라구요"
+- 숫자 공개: "[업종] 광고 모델 평균 점수 뜯어봤어요"
+- 반전: "[좋아 보이는 결과] 했더니 [반전 한마디]"
+- 공감 질문: "이거 사장님들 어떻게 하세요?" / "이거 나만 궁금해?"
+
+## 콘텐츠 소재 (우리 맥락)
+- 업종별 인상 차이 (친근한 vs 따뜻한, 전문적인 vs 신뢰감)
+- 연예인 광고 모델 분석 발견 (어떤 배우가 어떤 업종을 잘 먹는지)
+- 상세페이지·인스타 모델 고르는 현실
+- 사장이 본인 얼굴로 찍는 경우
+- 감으로 결정 vs 데이터 결정
+- MBTI처럼 재미있게 풀기 (얼굴 인상 MBTI)
+
+## 엔게이지먼트
+- 마지막은 항상 열린 질문 or 여운
+- "(아마도요.)" 같은 불확실 마무리 OK
+- 독자가 "어? 나도 그 고민" 할 구체 상황
+- Yes/No or 본인 경험 답하기 쉬운 질문
+
+## 금지 문구
+"흥미롭게도" "중요한 것은" "결론적으로" "정말" "매우" "거의" "활용하세요" "최적화" "노하우" "여러분" "저희가" "~하면 됩니다" "포기하지 마세요"
+
+본문만 출력. 제목·설명·따옴표 없이.`;
+
+const COMMENT_PROMPT = `앞서 쓴 Threads 메인 포스트에 본인이 이어다는 **1번 댓글**을 작성해요. 구조는 "문제 제기 → 우리가 풀었어요"예요.
+
+## 규칙
+- 200자 이하
+- 해시태그 X, 외부링크 X, 이모지 최대 1개, 느낌표 X
+- 메인 글의 결론("스스로는 모른다", "다들 감으로 한다" 같은 페인)을 자연스럽게 이어받기
+- "그래서" or "그런 문제 풀고 싶어서" 같은 연결어로 시작
+- Muse 서비스 본질만 짧게 (연예인 광고 데이터 50명·15업종, 10가지 인상, 데이터로 검증된 광고 모델 제안)
+- 홍보 톤 X. 개발자가 "이런 거 만들고 있어요" 투
+- 마지막은 "궁금하시면 DM 주세요" or "만들고 있는 중이에요" 같은 가벼운 한마디
+
+## 예시
+✅ "그래서 저희가 업종별 광고 모델 효과를 데이터로 검증하는 툴 만들고 있어요\\n\\n연예인 50명·15업종·10가지 인상으로 학습시켜서\\n\\n'당신 업종엔 어떤 인상이 맞다'를 알려주는 거예요\\n\\n궁금하시면 DM 주세요"
+✅ "그래서 이거 데이터로 풀고 싶어서 서비스 만들고 있어요\\n\\n연예인 광고 모델 50명 데이터를 학습시켜서 업종별로 어떤 인상이 효과적인지 알려주는 툴이에요\\n\\n만들고 있는 중이에요"
+
+## 금지
+- "저희 서비스는~", "혁신적인 AI 플랫폼" 같은 홍보 톤 X
+- 메인과 중복되는 내용 반복 X
+- 여러 기능 나열 X — 한 가지 본질만
+
+본문만 출력. 설명·따옴표 없이.`;
 
 // --- Notion Helpers ---
 
@@ -192,6 +269,46 @@ function getText(prop: any): string {
   return prop?.rich_text?.[0]?.plain_text ?? prop?.title?.[0]?.plain_text ?? "";
 }
 
+/** Threads 텍스트 포스트(또는 reply) 발행 — 컨테이너 생성 → 상태 폴링 → publish → postId 반환 */
+async function publishThreadsText(text: string, replyToId?: string): Promise<string> {
+  const body: any = {
+    media_type: "TEXT",
+    text,
+    access_token: env.accessToken,
+  };
+  if (replyToId) body.reply_to_id = replyToId;
+
+  const createRes = await fetch(`${BASE_URL}/${env.userId}/threads`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!createRes.ok) throw new Error(await createRes.text());
+  const { id: containerId } = await createRes.json();
+
+  let status = "IN_PROGRESS";
+  for (let i = 0; i < 10; i++) {
+    await new Promise((r) => setTimeout(r, 3000));
+    const sRes = await fetch(`${BASE_URL}/${containerId}?fields=status&access_token=${env.accessToken}`);
+    if (sRes.ok) {
+      const s = await sRes.json();
+      status = s.status;
+      if (status === "FINISHED") break;
+      if (status === "ERROR" || status === "EXPIRED") throw new Error(`Container status: ${status}`);
+    }
+  }
+  if (status !== "FINISHED") throw new Error(`Container not ready after 30s`);
+
+  const pubRes = await fetch(`${BASE_URL}/${env.userId}/threads_publish`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ creation_id: containerId, access_token: env.accessToken }),
+  });
+  if (!pubRes.ok) throw new Error(await pubRes.text());
+  const { id: postId } = await pubRes.json();
+  return postId;
+}
+
 // --- Generate ---
 
 export async function generateDrafts(): Promise<{ count: number }> {
@@ -219,10 +336,15 @@ export async function generateDrafts(): Promise<{ count: number }> {
     const content = await callGemini(prompt);
     if (!content || content.length > 500) continue;
 
+    // 메인 글 기반으로 1번 댓글 (서비스 소개) 생성
+    const commentPrompt = `앞서 쓴 메인 Threads 포스트:\n"""\n${content}\n"""\n\n이 메인 글에 이어다는 1번 댓글을 작성하세요. 메인의 결론·페인을 자연스럽게 이어받아서 "그래서 우리가 이런 거 만들고 있어요" 구조로요.`;
+    const comment = await callGeminiWithPrompt(commentPrompt, COMMENT_PROMPT);
+
     const preview = content.slice(0, 15).replace(/\n/g, " ");
     await createNotionPage(env.threadsDb, {
       제목: { title: [{ text: { content: `[${type}] ${preview}...` } }] },
       본문: { rich_text: [{ text: { content } }] },
+      댓글: { rich_text: [{ text: { content: comment || "" } }] },
       유형: { select: { name: type } },
       상태: { select: { name: "초안" } },
     });
@@ -257,6 +379,10 @@ export async function generateDrafts(): Promise<{ count: number }> {
 }
 
 async function callGemini(prompt: string): Promise<string> {
+  return callGeminiWithPrompt(prompt, SYSTEM_PROMPT);
+}
+
+async function callGeminiWithPrompt(prompt: string, systemPrompt: string): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${env.geminiKey}`;
 
   try {
@@ -264,19 +390,18 @@ async function callGemini(prompt: string): Promise<string> {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        system_instruction: { parts: [{ text: systemPrompt }] },
         contents: [{ parts: [{ text: prompt }] }],
       }),
     });
 
     if (!res.ok) {
-      // Fallback to gemma
       const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemma-3-27b-it:generateContent?key=${env.geminiKey}`;
       const fallbackRes = await fetch(fallbackUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: SYSTEM_PROMPT + "\n\n" + prompt }] }],
+          contents: [{ parts: [{ text: systemPrompt + "\n\n" + prompt }] }],
         }),
       });
       if (!fallbackRes.ok) throw new Error("Both Gemini models failed");
@@ -304,7 +429,7 @@ export async function publishApproved(): Promise<{ published: number }> {
   let published = 0;
   for (const page of pages) {
     const content = getText(page.properties["본문"]);
-    const title = getText(page.properties["제목"]);
+    const comment = getText(page.properties["댓글"]);
     const type = getText(page.properties["유형"]);
     const scheduledAt = page.properties["예약시간"]?.date?.start;
 
@@ -329,47 +454,17 @@ export async function publishApproved(): Promise<{ published: number }> {
     await updateNotionPage(page.id, { 상태: { select: { name: "발행중" } } });
 
     try {
-      // Create container
-      const createRes = await fetch(`${BASE_URL}/${env.userId}/threads`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          media_type: "TEXT", text: content, access_token: env.accessToken,
-        }),
-      });
-      if (!createRes.ok) throw new Error(await createRes.text());
-      const { id: containerId } = await createRes.json();
+      // 메인 포스트 발행
+      const postId = await publishThreadsText(content);
 
-      // 컨테이너 처리 완료 대기 (최대 30초)
-      let status = "IN_PROGRESS";
-      for (let i = 0; i < 10; i++) {
-        await new Promise((r) => setTimeout(r, 3000));
-        const sRes = await fetch(
-          `${BASE_URL}/${containerId}?fields=status&access_token=${env.accessToken}`
-        );
-        if (sRes.ok) {
-          const s = await sRes.json();
-          status = s.status;
-          if (status === "FINISHED") break;
-          if (status === "ERROR" || status === "EXPIRED") {
-            throw new Error(`Container status: ${status}`);
-          }
+      // 댓글(1번 스레드) 이어서 발행
+      if (comment && comment.trim()) {
+        try {
+          await publishThreadsText(comment.trim(), postId);
+        } catch (err) {
+          console.error("Comment publish failed:", err);
         }
       }
-      if (status !== "FINISHED") {
-        throw new Error(`Container not ready after 30s`);
-      }
-
-      // Publish container
-      const pubRes = await fetch(`${BASE_URL}/${env.userId}/threads_publish`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          creation_id: containerId, access_token: env.accessToken,
-        }),
-      });
-      if (!pubRes.ok) throw new Error(await pubRes.text());
-      const { id: postId } = await pubRes.json();
 
       // Get permalink
       const linkRes = await fetch(

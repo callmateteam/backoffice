@@ -22,6 +22,7 @@ export async function PATCH(
   const properties: any = {};
   if (body.status) properties["상태"] = { select: { name: body.status } };
   if (body.content) properties["본문"] = { rich_text: [{ text: { content: body.content } }] };
+  if (body.comment !== undefined) properties["댓글"] = { rich_text: [{ text: { content: body.comment } }] };
   if (body.scheduledAt) properties["예약시간"] = { date: { start: body.scheduledAt } };
 
   const res = await fetch(`${NOTION_API}/pages/${id}`, {

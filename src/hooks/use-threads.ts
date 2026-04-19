@@ -6,6 +6,7 @@ export interface ThreadPost {
   id: string;
   title: string;
   content: string;
+  comment: string;
   type: string;
   status: string;
   scheduledAt: string | null;
@@ -57,7 +58,7 @@ export function useThreadReplies() {
 export function useUpdateThreadPost() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...data }: { id: string; status?: string; content?: string; scheduledAt?: string }) => {
+    mutationFn: async ({ id, ...data }: { id: string; status?: string; content?: string; comment?: string; scheduledAt?: string }) => {
       const res = await fetch(`/api/threads/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
