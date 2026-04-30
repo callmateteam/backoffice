@@ -56,6 +56,17 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
 };
 
 const TYPE_COLORS: Record<string, string> = {
+  // 신규 카테고리 (2026 리팩토링)
+  제품데모: "bg-purple-50 text-purple-600",
+  사장님케이스: "bg-pink-50 text-pink-600",
+  데이터연예인: "bg-blue-50 text-blue-600",
+  빌인퍼블릭: "bg-orange-50 text-orange-600",
+  업계관점: "bg-red-50 text-red-600",
+  일상: "bg-gray-50 text-gray-600",
+  학습: "bg-green-50 text-green-600",
+  양방향: "bg-yellow-50 text-yellow-700",
+  AI약빨: "bg-amber-50 text-amber-700",
+  // 레거시 (과거 발행글 호환)
   공감형: "bg-rose-50 text-rose-600",
   고백형: "bg-fuchsia-50 text-fuchsia-600",
   반전형: "bg-amber-50 text-amber-600",
