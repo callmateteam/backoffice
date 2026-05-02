@@ -676,6 +676,20 @@ export async function generateDrafts(): Promise<{ count: number; category: strin
   const category = getTodayCategory();
   const categoryLabel = CATEGORY_LABELS[category];
 
+  // 오늘 KST 0시 이후 생성된 초안이 이미 있으면 중단 (하루 1개 정책)
+  const todayKst = new Date(Date.now() + 9 * 3600 * 1000);
+  todayKst.setUTCHours(0, 0, 0, 0);
+  const todayUtc = new Date(todayKst.getTime() - 9 * 3600 * 1000);
+
+  const todayDrafts = await queryNotionDb(env.threadsDb, {
+    timestamp: 'created_time',
+    created_time: { on_or_after: todayUtc.toISOString() },
+  });
+  if (todayDrafts.length > 0) {
+    console.log(`Skip: 오늘 이미 ${todayDrafts.length}개 초안 존재`);
+    return { count: 0, category: categoryLabel };
+  }
+
   // 최근 글 (중복 회피)
   const recent = await queryNotionDb(env.threadsDb, undefined,
     [{ timestamp: 'created_time', direction: 'descending' }], 6);
